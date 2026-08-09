@@ -406,7 +406,7 @@ export function TrainerTable({ selectedCenter: externalCenter, onSelectCenter }:
   const handleRefreshData = async () => {
     setLoading(true)
     await loadData()
-    setExportNotification("🔄 Données du réseau et statut de capacité 2026 actualisés avec succès en direct de FastAPI !")
+    setExportNotification('✨ Tableau de suivi et planning des formateurs actualisés avec succès !')
     setTimeout(() => setExportNotification(null), 3500)
     setLoading(false)
   }

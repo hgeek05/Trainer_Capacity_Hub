@@ -10,7 +10,6 @@ import {
 } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
-
 export type TabType = 'dashboard' | 'trainers' | 'activities' | 'settings'
 
 interface SidebarProps {
@@ -44,15 +43,15 @@ export function Sidebar({
 
   return (
     <aside className="hidden w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
-      {/* En-tête avec Logo Transparent Officiel UM6P | TECHNIX */}
+      {/* En-tête avec Logo Officiel UM6P | TECHNIX */}
       <div className="flex flex-col gap-2.5 px-4 pt-5 pb-5 border-b border-sidebar-border/60 mb-2">
-        <div className="flex items-center justify-start p-1.5 rounded-xl transition-colors">
+        <div className="flex items-center justify-start bg-white p-2 rounded-xl border border-sidebar-border/50 shadow-xs">
           <img
             src="/images/um6p-technix-logo.png"
             alt="UM6P TECHNIX"
-            className="h-8.5 w-auto object-contain dark:brightness-110 dark:contrast-110"
+            className="h-8 w-auto object-contain"
             onError={(e) => {
-              ;(e.target as HTMLImageElement).src = '/um6p-technix-logo.png'
+              ; (e.target as HTMLImageElement).src = '/um6p-technix-logo.png'
             }}
           />
         </div>

@@ -13,7 +13,6 @@ sample_trainers = [
     {"id": 6, "name": "Salma Bennis", "email": "salma.bennis@um6p.ma", "anim": 112.0, "absence": 5.0},
 ]
 
-
 def detect_trainer_anomalies(db: Session) -> list[dict]:
     # 1. Récupérer les formateurs et leurs métriques (charges déclarées, congés, etc.)
     data = []
@@ -41,7 +40,6 @@ def detect_trainer_anomalies(db: Session) -> list[dict]:
                 )
     except Exception as e:
         print("Database error in detect_trainer_anomalies:", e)
-
     # Compléter avec les formateurs de démonstration si besoin pour que l'IA ait toujours un jeu suffisant
     existing_emails = {d["email"].lower() for d in data if d.get("email")}
     for s in sample_trainers:
@@ -56,29 +54,23 @@ def detect_trainer_anomalies(db: Session) -> list[dict]:
                     "workload_ratio": s["anim"] / 189.0,
                 }
             )
-
     df = pd.DataFrame(data)
     if len(df) < 3:
         return []
-
     # 2. Sélection des features pour l'Isolation Forest
     features = df[["animation_declared", "absence_days", "workload_ratio"]]
-
     # 3. Entraînement du modèle (contamination = pourcentage estimé d'anomalies)
     model = IsolationForest(contamination=0.3, random_state=42)
     df["anomaly_score"] = model.fit_predict(features)
     df["anomaly_decision"] = model.decision_function(features)
-
     # -1 signifie une anomalie détectée (surcharge suspecte ou comportement atypique)
     anomalies = df[df["anomaly_score"] == -1]
-
     # 4. Traduction du diagnostic mathématique en recommandations et deltas métier
     result = []
     for _, row in anomalies.iterrows():
         anim_decl = float(row["animation_declared"])
         absence = float(row["absence_days"])
         delta = int(round(anim_decl - 107))
-
         if anim_decl > 120:
             diagnostic = f"Surcharge critique : {anim_decl:.0f} jours d'animation déclarés (dépasse la cible de 107j de +{delta}j)."
             niveau = "Critique (Surcharge)"
@@ -88,7 +80,6 @@ def detect_trainer_anomalies(db: Session) -> list[dict]:
         else:
             diagnostic = f"Profil atypique détecté : Volume global de {anim_decl:.0f} jours d'animation hors des moyennes habituelles du centre."
             niveau = "À auditer"
-
         result.append(
             {
                 "trainer_id": int(row["trainer_id"]),
@@ -104,7 +95,6 @@ def detect_trainer_anomalies(db: Session) -> list[dict]:
         )
 
     return result
-
 
 def detect_workload_anomalies_for_db(db: Session):
     return detect_trainer_anomalies(db)

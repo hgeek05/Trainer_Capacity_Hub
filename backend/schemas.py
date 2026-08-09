@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field 
+from pydantic import BaseModel, EmailStr, Field
 from datetime import date
 from enum import Enum
 from typing import Optional
@@ -21,49 +21,46 @@ class ActivityTypeEnum(str, Enum):
 
 # 2. DONNÉES UTILISATEURS (Identification requise par le tuteur)
 class UserData(BaseModel):
-    # Field(...) signifie que la donnée est obligatoire.
-    matricule: str = Field(..., description="Donnée sensible : Identifiant unique")
-    nom_prenom: str = Field(..., description="Nom et prénom complets")
-    email: str = Field(..., description="Adresse e-mail Technix UM6P")
+    matricule: str = Field(..., min_length=2, max_length=50, description="Donnée sensible : Identifiant unique")
+    nom_prenom: str = Field(..., min_length=2, max_length=100, description="Nom et prénom complets")
+    email: EmailStr = Field(..., description="Adresse e-mail Technix UM6P")
     role: RoleEnum = Field(...)
     centre: CenterEnum = Field(...)
     date_entree: date = Field(...)
-    manager_responsable: Optional[str] = Field(None, description="Donnée facultative")
+    manager_responsable: Optional[str] = Field(None, max_length=100, description="Donnée facultative")
 
 # 3. DONNÉES DE CHARGE ET DISPONIBILITÉ
 class ActivityData(BaseModel):
-    formateur_id: str = Field(..., description="Lien avec l'utilisateur")
+    formateur_id: str = Field(..., min_length=1, max_length=50, description="Lien avec l'utilisateur")
     type_activite: ActivityTypeEnum = Field(...)
-    # Ajout du paramètre gt=0 (greater than 0) pour rejeter les durées négatives
-    duree_heures: float = Field(..., gt=0, description="La durée doit être strictement positive")
+    duree_heures: float = Field(..., gt=0, le=24, description="La durée doit être supérieure à 0 et inférieure ou égale à 24 heures")
     date_debut: date = Field(...)
 
-# Schéma pour la création (ce qu'on envoie à l'API)
+# Schéma pour la création d'utilisateur
 class UserCreate(BaseModel):
-    employee_id: str
+    employee_id: str = Field(..., min_length=2, max_length=30, pattern=r"^[A-Za-z0-9_-]+$")
     email: EmailStr
-    first_name: str
-    last_name: str
+    first_name: str = Field(..., min_length=1, max_length=50)
+    last_name: str = Field(..., min_length=1, max_length=50)
     is_active: bool = True
 
-# Schéma pour la réponse (ce que l'API renvoie)
+# Schéma pour la réponse utilisateur
 class UserResponse(UserCreate):
     id: int
-
     first_name: Optional[str] = None
     last_name: Optional[str] = None
 
     class Config:
         from_attributes = True
 
-# Schéma simple pour la création via /trainers (front-end léger)
+# Schéma pour la création via /trainers (front-end léger avec validation stricte)
 class TrainerCreate(BaseModel):
-    name: str
+    name: str = Field(..., min_length=2, max_length=100, description="Nom complet du formateur")
     email: EmailStr
-    role: Optional[str] = "Formateur"
-    center: Optional[str] = "Ben Guerir"
-    center_id: Optional[int] = 1
-    domain: Optional[str] = "Digital"
+    role: Optional[str] = Field("Formateur", max_length=50)
+    center: Optional[str] = Field("Ben Guerir", max_length=50)
+    center_id: Optional[int] = Field(1, ge=1)
+    domain: Optional[str] = Field("Digital", max_length=50)
 
 
 class CapacitySummaryResponse(BaseModel):

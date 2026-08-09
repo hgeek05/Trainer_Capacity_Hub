@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { ArrowRight, CheckCircle2, Sliders, Sparkles, X } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n'
 
 interface TrainerOption {
   name: string
@@ -23,6 +24,8 @@ export function SimulationModal({
   trainers,
   onApplySimulation,
 }: SimulationModalProps) {
+  const { t } = useLanguage()
+
   const [sourceName, setSourceName] = useState<string>('Nadia Amrani')
   const [targetName, setTargetName] = useState<string>('Omar Chraibi')
   const [daysToTransfer, setDaysToTransfer] = useState<number>(20)
@@ -76,14 +79,14 @@ export function SimulationModal({
               <Sliders className="size-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-foreground">Simulation d'Impact "What-If"</h3>
-              <p className="text-xs text-muted-foreground">Rééquilibrage prédictif de charge entre formateurs</p>
+              <h3 className="text-base font-bold text-foreground">{t.simTitle}</h3>
+              <p className="text-xs text-muted-foreground">{t.simSubtitle}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+            className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors cursor-pointer"
           >
             <X className="size-4" />
           </button>
@@ -92,7 +95,7 @@ export function SimulationModal({
         {applied && (
           <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
             <CheckCircle2 className="size-4 text-emerald-500" />
-            Rééquilibrage appliqué avec succès dans le planning courant !
+            {t.simAppliedSuccess}
           </div>
         )}
 
@@ -101,16 +104,16 @@ export function SimulationModal({
             {/* Formateur Source (Surchargé) */}
             <div className="p-4 rounded-xl border border-rose-500/30 bg-rose-500/5">
               <label className="block text-xs font-semibold text-rose-700 dark:text-rose-300 mb-1.5">
-                🔴 Formateur Source (Transfert de charge)
+                {t.simSourceLabel}
               </label>
               <select
                 value={sourceName}
                 onChange={(e) => setSourceName(e.target.value)}
-                className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-rose-500/20"
+                className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-rose-500/20 cursor-pointer"
               >
-                {trainers.map((t) => (
-                  <option key={t.name} value={t.name}>
-                    {t.name} ({t.center}) — {t.animUsed}j
+                {trainers.map((tr) => (
+                  <option key={tr.name} value={tr.name}>
+                    {tr.name} ({tr.center}) — {tr.animUsed}{t.days}
                   </option>
                 ))}
               </select>
@@ -119,16 +122,16 @@ export function SimulationModal({
             {/* Formateur Cible (Disponible) */}
             <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/5">
               <label className="block text-xs font-semibold text-emerald-700 dark:text-emerald-300 mb-1.5">
-                🟢 Formateur Cible (Réception de charge)
+                {t.simTargetLabel}
               </label>
               <select
                 value={targetName}
                 onChange={(e) => setTargetName(e.target.value)}
-                className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer"
               >
-                {trainers.map((t) => (
-                  <option key={t.name} value={t.name}>
-                    {t.name} ({t.center}) — {t.animUsed}j
+                {trainers.map((tr) => (
+                  <option key={tr.name} value={tr.name}>
+                    {tr.name} ({tr.center}) — {tr.animUsed}{t.days}
                   </option>
                 ))}
               </select>
@@ -138,8 +141,8 @@ export function SimulationModal({
           {/* Slider de transfert */}
           <div className="p-4 rounded-xl border border-border bg-secondary/30">
             <div className="flex justify-between items-center text-xs mb-2">
-              <span className="font-semibold text-foreground">Volume de jours d'animation à transférer</span>
-              <span className="font-bold text-primary text-sm font-mono">{daysToTransfer} Jours</span>
+              <span className="font-semibold text-foreground">{t.simVolumeLabel}</span>
+              <span className="font-bold text-primary text-sm font-mono">{daysToTransfer} {t.daysCount}</span>
             </div>
             <input
               type="range"
@@ -151,9 +154,9 @@ export function SimulationModal({
               className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
             />
             <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
-              <span>5 jours</span>
-              <span>20 jours (Recommandé)</span>
-              <span>40 jours</span>
+              <span>5 {t.days}</span>
+              <span>20 {t.days}</span>
+              <span>40 {t.days}</span>
             </div>
           </div>
 
@@ -166,9 +169,9 @@ export function SimulationModal({
                 <span className="text-[10px] text-muted-foreground">({sourceTrainer.center})</span>
               </p>
               <div className="flex items-center justify-between text-muted-foreground">
-                <span>Avant : <strong className="text-rose-600">{sourceCurrent}j</strong> (+{sourceCurrentDelta}j)</span>
+                <span>{t.vsLastPeriod.split(' ')[0]} : <strong className="text-rose-600">{sourceCurrent}{t.days}</strong> (+{sourceCurrentDelta}{t.days})</span>
                 <ArrowRight className="size-3.5 text-muted-foreground" />
-                <span>Après : <strong className="text-emerald-600">{sourceNew}j</strong> ({sourceNewDelta >= 0 ? `+${sourceNewDelta}j` : `${sourceNewDelta}j`})</span>
+                <span>Après : <strong className="text-emerald-600">{sourceNew}{t.days}</strong> ({sourceNewDelta >= 0 ? `+${sourceNewDelta}${t.days}` : `${sourceNewDelta}${t.days}`})</span>
               </div>
             </div>
 
@@ -179,9 +182,9 @@ export function SimulationModal({
                 <span className="text-[10px] text-muted-foreground">({targetTrainer.center})</span>
               </p>
               <div className="flex items-center justify-between text-muted-foreground">
-                <span>Avant : <strong className="text-emerald-600">{targetCurrent}j</strong> ({targetCurrentDelta}j)</span>
+                <span>{t.vsLastPeriod.split(' ')[0]} : <strong className="text-emerald-600">{targetCurrent}{t.days}</strong> ({targetCurrentDelta}{t.days})</span>
                 <ArrowRight className="size-3.5 text-muted-foreground" />
-                <span>Après : <strong className="text-primary font-bold">{targetNew}j</strong> ({targetNewDelta}j)</span>
+                <span>Après : <strong className="text-primary font-bold">{targetNew}{t.days}</strong> ({targetNewDelta}{t.days})</span>
               </div>
             </div>
           </div>
@@ -193,7 +196,7 @@ export function SimulationModal({
             onClick={onClose}
             className="px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-secondary rounded-lg transition-colors cursor-pointer"
           >
-            Annuler
+            {t.cancel}
           </button>
           <button
             type="button"
@@ -201,7 +204,7 @@ export function SimulationModal({
             className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-primary-foreground bg-purple-600 hover:bg-purple-700 rounded-lg shadow-sm transition-all cursor-pointer"
           >
             <Sparkles className="size-3.5" />
-            Appliquer le Rééquilibrage
+            {t.simApplyBtn}
           </button>
         </div>
       </div>

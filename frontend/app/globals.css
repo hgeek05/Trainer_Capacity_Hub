@@ -127,13 +127,18 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0.022 45);
-  --sidebar-foreground: oklch(0.75 0.03 55);
+  --sidebar: oklch(0.185 0.004 100);
+  --sidebar-foreground: oklch(0.72 0.005 100);
+
+  /* Orange pour les éléments actifs */
   --sidebar-primary: oklch(0.67 0.17 43);
-  --sidebar-primary-foreground: oklch(0.185 0.004 100);
-  --sidebar-accent: oklch(0.28 0.03 45);
-  --sidebar-accent-foreground: oklch(0.96 0 0);
-  --sidebar-border: oklch(0.7 0.1 50 / 14%);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+
+  /* Orange foncé au survol */
+  --sidebar-accent: oklch(0.32 0.08 45);
+  --sidebar-accent-foreground: oklch(0.98 0.01 60);
+
+  --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.67 0.17 43);
   --pastel-green: oklch(0.32 0.05 160);
   --pastel-green-foreground: oklch(0.85 0.09 160);

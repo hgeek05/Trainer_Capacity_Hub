@@ -10,6 +10,9 @@ COPY . .
 
 RUN npm run build
 
+# Unprivileged node user execution
+USER node
+
 EXPOSE 3000
 
 CMD ["npm", "start"]

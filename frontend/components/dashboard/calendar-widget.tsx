@@ -1,138 +1,101 @@
 'use client'
 
-import React, { useState } from 'react'
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react'
-
-// Liste officielle des jours fériés au Maroc (2026)
-const MOROCCO_HOLIDAYS_2026: Record<string, { name: string; type: 'legal' | 'religious' | 'closure' }> = {
-  "2026-01-01": { name: "Nouvel An", type: 'legal' },
-  "2026-01-11": { name: "Manifeste de l'Indépendance", type: 'legal' },
-  "2026-01-14": { name: "Nouvel An Amazigh", type: 'legal' },
-  "2026-03-20": { name: "Aïd al-Fitr (Jour 1)", type: 'religious' },
-  "2026-03-21": { name: "Aïd al-Fitr (Jour 2)", type: 'religious' },
-  "2026-03-22": { name: "Aïd al-Fitr (Jour 3)", type: 'religious' },
-  "2026-05-01": { name: "Fête du Travail", type: 'legal' },
-  "2026-05-27": { name: "Aïd al-Adha (Jour 1)", type: 'religious' },
-  "2026-05-28": { name: "Aïd al-Adha (Jour 2)", type: 'religious' },
-  "2026-07-30": { name: "Fête du Trône", type: 'legal' },
-  "2026-08-14": { name: "Allégeance Oued Eddahab", type: 'legal' },
-  "2026-08-20": { name: "Révolution du Roi et du Peuple", type: 'legal' },
-  "2026-08-21": { name: "Fête de la Jeunesse", type: 'legal' },
-  "2026-11-06": { name: "Marche Verte", type: 'legal' },
-  "2026-11-18": { name: "Fête de l'Indépendance", type: 'legal' },
-}
+import React, { useCallback, useMemo, useState } from 'react'
+import { Sparkles } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n'
+import { MOROCCO_HOLIDAYS_2026, MOROCCO_HOLIDAYS_2026_EN } from '@/lib/calendar-data'
+import { CalendarDetailModal } from '@/components/dashboard/calendar-detail-modal'
 
 export function CalendarWidget() {
-  // Mois initial : Août 2026
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 7, 1))
+  const { t, lang } = useLanguage()
+  const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), [])
+  const [currentDate, setCurrentDate] = useState(() => new Date(2026, 7, 1))
+  const [selectedDayDetails, setSelectedDayDetails] = useState<{ dateStr: string; dayNum: number } | null>(null)
 
-  const year = currentDate.getFullYear()
-  const month = currentDate.getMonth()
+  const year = currentDate.getFullYear(), month = currentDate.getMonth()
+  const daysInMonth = useMemo(() => new Date(year, month + 1, 0).getDate(), [year, month])
+  const firstDayOfWeek = useMemo(() => (new Date(year, month, 1).getDay() + 6) % 7, [year, month])
+  const emptyDaysArray = useMemo(() => Array.from({ length: firstDayOfWeek }), [firstDayOfWeek])
+  const monthDaysArray = useMemo(() => Array.from({ length: daysInMonth }, (_, i) => i + 1), [daysInMonth])
 
-  const monthNames = [
-    "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-    "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+  const changeMonth = useCallback((d: number) => setCurrentDate((p) => new Date(p.getFullYear(), p.getMonth() + d, 1)), [])
+  const jumpToMonth = useCallback((m: number) => setCurrentDate((p) => new Date(p.getFullYear(), m, 1)), [])
+  const getHolidayName = useCallback((d: string, def: string) => (lang === 'en' && MOROCCO_HOLIDAYS_2026_EN[d] ? MOROCCO_HOLIDAYS_2026_EN[d] : def), [lang])
+
+  const currentMonthHolidays = useMemo(() => Object.entries(MOROCCO_HOLIDAYS_2026).filter(([d]) => Number(d.split('-')[0]) === year && Number(d.split('-')[1]) === month + 1), [year, month])
+  const shortcuts = [
+    { idx: 2, label: t.calendarShortcutAidFitr || (lang === 'en' ? '🌙 Eid al-Fitr (March)' : '🌙 Aïd al-Fitr (Mars)'), color: 'amber' },
+    { idx: 4, label: t.calendarShortcutAidAdha || (lang === 'en' ? '🐏 Eid al-Adha (May)' : '🐏 Aïd al-Adha (Mai)'), color: 'amber' },
+    { idx: 6, label: t.calendarShortcutThrone || (lang === 'en' ? '👑 Throne Day (July)' : '👑 Fête du Trône (Juillet)'), color: 'rose' },
+    { idx: 10, label: t.calendarShortcutGreenMarch || (lang === 'en' ? '🇲🇦 Green March (Nov)' : '🇲🇦 Marche Verte (Novembre)'), color: 'rose' },
   ]
 
-  // Calcul dynamique des jours
-  const daysInMonth = new Date(year, month + 1, 0).getDate()
-  // Premier jour du mois (0 = Lundi, 6 = Dimanche)
-  const firstDayOfWeek = (new Date(year, month, 1).getDay() + 6) % 7
-
-  const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1))
-  const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1))
-
   return (
-    <div className="bg-card p-5 rounded-2xl border border-border shadow-xs">
-      {/* En-tête avec Navigation */}
-      <div className="flex justify-between items-center mb-4 border-b border-border pb-3">
-        <div className="flex items-center gap-2">
-          <CalendarIcon className="size-4 text-primary" />
-          <h4 className="font-bold text-sm text-foreground">
-            {monthNames[month]} {year}
-          </h4>
-        </div>
-        <div className="flex items-center gap-1">
-          <button 
-            type="button"
-            onClick={prevMonth}
-            className="p-1 px-2 text-xs font-bold border border-border rounded-lg hover:bg-secondary text-foreground transition-all cursor-pointer"
-            title="Mois précédent"
-          >
-            <ChevronLeft className="size-3.5" />
-          </button>
-          <button 
-            type="button"
-            onClick={nextMonth}
-            className="p-1 px-2 text-xs font-bold border border-border rounded-lg hover:bg-secondary text-foreground transition-all cursor-pointer"
-            title="Mois suivant"
-          >
-            <ChevronRight className="size-3.5" />
-          </button>
+    <div className="bg-card p-4 sm:p-5 rounded-2xl border border-border shadow-xs relative overflow-hidden">
+      <div className="flex justify-between items-center mb-4 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100"><span>📅</span> {t.months[month]} {year}</div>
+        <div className="flex gap-1">
+          <button type="button" onClick={() => changeMonth(-1)} className="w-7 h-7 flex items-center justify-center bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-xs font-bold shadow-2xs hover:bg-slate-100 dark:hover:bg-slate-600 cursor-pointer" title={t.calendarPrevMonth}>&lt;</button>
+          <button type="button" onClick={() => changeMonth(1)} className="w-7 h-7 flex items-center justify-center bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-xs font-bold shadow-2xs hover:bg-slate-100 dark:hover:bg-slate-600 cursor-pointer" title={t.calendarNextMonth}>&gt;</button>
         </div>
       </div>
 
-      {/* Jours de la semaine */}
+      <div className="flex flex-wrap items-center gap-1.5 mb-3">
+        <span className="text-[10px] font-bold text-muted-foreground uppercase mr-1">{t.calendarShortcuts}</span>
+        {shortcuts.map((s) => (<button key={s.idx} type="button" onClick={() => jumpToMonth(s.idx)} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border cursor-pointer transition-all ${month === s.idx ? (s.color === 'amber' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-rose-500 text-white border-rose-600 shadow-xs') : (s.color === 'amber' ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30 hover:bg-amber-500/20' : 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/30 hover:bg-rose-500/20')}`}>{s.label}</button>))}
+      </div>
+
       <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-semibold text-muted-foreground mb-2">
-        <span>Lu</span><span>Ma</span><span>Me</span><span>Je</span><span>Ve</span><span>Sa</span><span>Di</span>
+        {t.weekdays.map((wd: string, i: number) => <span key={i}>{wd}</span>)}
       </div>
 
-      {/* Grille du calendrier */}
       <div className="grid grid-cols-7 gap-1 text-center">
-        {/* Cases vides avant le 1er du mois */}
-        {Array.from({ length: firstDayOfWeek }).map((_, i) => (
-          <div key={`empty-${i}`} className="h-7 w-7" />
-        ))}
-
-        {/* Jours du mois */}
-        {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
+        {emptyDaysArray.map((_, i) => <div key={`e-${i}`} className="h-8 w-8" />)}
+        {monthDaysArray.map((day) => {
           const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-          const holiday = MOROCCO_HOLIDAYS_2026[dateStr]
-          const isSummerClosure = (month === 6 || month === 7) && !holiday // Juillet/Août
-
-          let bgStyle = "hover:bg-primary/10 text-foreground font-medium"
-          let tooltip = "Jour ouvré d'animation"
-
+          const holiday = MOROCCO_HOLIDAYS_2026[dateStr], isPast = dateStr < todayStr
+          let style = 'hover:bg-primary/10 text-foreground font-medium border border-transparent', tooltip = t.calendarTooltipWorkday
           if (holiday) {
-            if (holiday.type === 'religious') {
-              bgStyle = "bg-amber-500/20 text-amber-900 dark:text-amber-200 font-bold border border-amber-500/30"
-              tooltip = `Fête Religieuse : ${holiday.name}`
-            } else {
-              bgStyle = "bg-rose-500/20 text-rose-900 dark:text-rose-200 font-bold border border-rose-500/30"
-              tooltip = `Jour Férié : ${holiday.name}`
-            }
-          } else if (isSummerClosure) {
-            bgStyle = "bg-secondary text-muted-foreground/60 line-through"
-            tooltip = "Période d'été / Neutralisée"
-          }
+            style = holiday.type === 'religious' ? 'bg-amber-500/30 text-amber-950 dark:text-amber-100 font-extrabold border-2 border-amber-500 shadow-xs scale-105' : 'bg-rose-500/30 text-rose-950 dark:text-rose-100 font-extrabold border-2 border-rose-500 shadow-xs scale-105'
+            tooltip = `${holiday.type === 'religious' ? t.calendarTooltipReligious : t.calendarTooltipLegal} ${getHolidayName(dateStr, holiday.name)}`
+          } else if (dateStr === todayStr) { style = 'ring-2 ring-primary bg-primary/20 font-bold text-primary shadow-xs'; tooltip = t.calendarTooltipToday }
+          else if (isPast) { style = 'bg-secondary/60 text-muted-foreground/70 font-normal hover:bg-secondary'; tooltip = `${t.calendarTooltipPast} (${dateStr})` }
+          else if (month === 6 || month === 7) { style = 'bg-secondary text-muted-foreground/50 line-through'; tooltip = t.calendarTooltipSummer }
 
           return (
-            <div
-              key={day}
-              title={tooltip}
-              className={`h-7 w-7 flex items-center justify-center rounded-lg text-xs transition-all cursor-pointer mx-auto ${bgStyle}`}
-            >
-              {day}
+            <div key={day} title={tooltip} onClick={() => setSelectedDayDetails({ dateStr, dayNum: day })} className={`h-8 w-8 relative flex flex-col items-center justify-center rounded-lg text-xs cursor-pointer mx-auto transition-all ${style}`}>
+              <span>{day}</span>
+              {holiday && <span className="text-[7px] font-bold uppercase tracking-tight -mt-0.5">{holiday.type === 'religious' ? t.calendarHolidayAid : t.calendarHolidayLegal}</span>}
+              {isPast && !holiday && <span className="absolute -top-0.5 -right-0.5 text-[9px] font-extrabold text-emerald-600 dark:text-emerald-400">✓</span>}
             </div>
           )
         })}
       </div>
 
-      {/* Légende officielle */}
-      <div className="mt-4 pt-3 border-t border-border space-y-1.5 text-[11px] text-muted-foreground">
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-secondary border border-border" /> Jour Ouvré Standard
+      <div className="mt-4 pt-3 border-t border-border space-y-2">
+        <div className="flex items-center justify-between text-xs font-bold text-foreground">
+          <span className="flex items-center gap-1.5"><Sparkles className="size-3.5 text-primary" /> {t.calendarEventsOf} {t.months[month]} {year} :</span>
+          <span className="text-[10px] font-semibold text-muted-foreground">{currentMonthHolidays.length} {t.calendarNeutralizedDays}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-rose-500" /> Jour Férié Officiel (Maroc)
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-400" /> Fête Religieuse (Aïd, etc.)
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-muted-foreground/40" /> Période de Fermeture Estivale
-        </div>
+        {currentMonthHolidays.length > 0 ? (
+          <div className="space-y-1.5">
+            {currentMonthHolidays.map(([dStr, h], idx) => (
+              <div key={idx} onClick={() => setSelectedDayDetails({ dateStr: dStr, dayNum: Number(dStr.split('-')[2]) })} className={`flex items-center justify-between p-2 rounded-lg text-xs font-semibold cursor-pointer border transition-all hover:scale-[1.01] ${h.type === 'religious' ? 'bg-amber-500/10 text-amber-800 dark:text-amber-200 border-amber-500/30' : 'bg-rose-500/10 text-rose-800 dark:text-rose-200 border-rose-500/30'}`}>
+                <div className="flex items-center gap-2"><span>{h.type === 'religious' ? '🌙' : '🇲🇦'}</span><span>{getHolidayName(dStr, h.name)}</span></div>
+                <span className="font-mono text-[10px] opacity-80">{dStr}</span>
+              </div>
+            ))}
+          </div>
+        ) : <p className="text-[11px] text-muted-foreground py-2 text-center bg-secondary/40 rounded-lg border border-border/60">{t.calendarNoHolidays.replace('{month}', t.months[month])}</p>}
       </div>
+
+      <div className="mt-3 pt-3 border-t border-border space-y-1 text-[11px] text-muted-foreground">
+        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-md bg-amber-500 border border-amber-600" /> {t.calendarLegendReligious}</div>
+        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-md bg-rose-500 border border-rose-600" /> {t.calendarLegendLegal}</div>
+        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-md bg-secondary border border-border" /> {t.calendarLegendPast}</div>
+      </div>
+
+      <CalendarDetailModal selectedDayDetails={selectedDayDetails} onClose={() => setSelectedDayDetails(null)} todayStr={todayStr} t={t} lang={lang} />
     </div>
   )
 }

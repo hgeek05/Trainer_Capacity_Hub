@@ -14,7 +14,6 @@ DEFAULT_CENTERS = [
     {"id": 4, "nom_centre": "Khouribga"},
 ]
 
-
 @router.get("/")
 def get_centers(db: Session = Depends(get_db)):
     try:

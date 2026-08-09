@@ -3,6 +3,7 @@
 import {
   Activity,
   Building2,
+  Calendar,
   LayoutDashboard,
   MapPin,
   Settings,
@@ -10,7 +11,7 @@ import {
 } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
-export type TabType = 'dashboard' | 'trainers' | 'activities' | 'settings'
+export type TabType = 'dashboard' | 'trainers' | 'planning' | 'activities' | 'settings'
 
 interface SidebarProps {
   activeTab?: TabType
@@ -30,6 +31,7 @@ export function Sidebar({
   const mainItems: { id: TabType; label: string; icon: any }[] = [
     { id: 'dashboard', label: t.dashboard || 'Dashboard Global', icon: LayoutDashboard },
     { id: 'trainers', label: t.trainers || 'Formateurs', icon: Users },
+    { id: 'planning', label: t.planning || 'Planning & Sessions', icon: Calendar },
     { id: 'activities', label: t.activities || 'Activités & Charges', icon: Activity },
     { id: 'settings', label: t.settings || 'Réglages System', icon: Settings },
   ]
@@ -78,8 +80,8 @@ export function Sidebar({
                     className={cn(
                       'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium transition-colors cursor-pointer',
                       isActive
-                        ? 'bg-sidebar-accent text-sidebar-accent-foreground font-semibold shadow-2xs'
-                        : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
+                        ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground shadow-sm dark:bg-sidebar-primary dark:text-sidebar-primary-foreground'
+                        : 'text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground dark:hover:bg-sidebar-accent dark:hover:text-sidebar-accent-foreground',
                     )}
                   >
                     <Icon className="size-4 shrink-0" />
@@ -93,7 +95,7 @@ export function Sidebar({
 
         <div>
           <p className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/70">
-            {t.centers} (PostgreSQL)
+            {t.centers}
           </p>
           <ul className="flex flex-col gap-1">
             <li>
@@ -106,13 +108,13 @@ export function Sidebar({
                 className={cn(
                   'flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs transition-colors cursor-pointer',
                   selectedCenter === 'ALL'
-                    ? 'bg-sidebar-accent font-semibold text-sidebar-accent-foreground'
-                    : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
+                    ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground shadow-sm dark:bg-sidebar-primary dark:text-sidebar-primary-foreground'
+                    : 'text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground dark:hover:bg-sidebar-accent dark:hover:text-sidebar-accent-foreground',
                 )}
               >
                 <span className="flex items-center gap-2.5">
                   <Building2 className="size-3.5" />
-                  Tous les centres
+                  {t.allCenters}
                 </span>
                 <span className="text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 rounded-md">
                   4
@@ -132,8 +134,8 @@ export function Sidebar({
                     className={cn(
                       'flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs transition-colors cursor-pointer',
                       isSelected
-                        ? 'bg-primary/15 font-semibold text-primary border border-primary/20'
-                        : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
+                        ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground shadow-sm dark:bg-sidebar-primary dark:text-sidebar-primary-foreground'
+                        : 'text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground dark:hover:bg-sidebar-accent dark:hover:text-sidebar-accent-foreground',
                     )}
                   >
                     <span className="flex items-center gap-2.5">

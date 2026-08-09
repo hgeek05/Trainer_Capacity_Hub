@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Building2, CheckCircle2, Loader2, Sparkles, UserPlus, X } from 'lucide-react'
 import { createTrainer, type TrainerApiData } from '@/lib/api'
+import { useLanguage } from '@/lib/i18n'
 
 interface AddTrainerModalProps {
   isOpen: boolean
@@ -11,6 +12,8 @@ interface AddTrainerModalProps {
 }
 
 export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerModalProps) {
+  const { t } = useLanguage()
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -31,10 +34,24 @@ export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerM
     setErrorMsg(null)
     setSuccessMsg(null)
 
+    const sanitizedData = {
+      name: formData.name.trim(),
+      email: formData.email.trim().toLowerCase(),
+      center: formData.center.trim(),
+      domain: formData.domain.trim(),
+      role: formData.role.trim(),
+    }
+
+    if (sanitizedData.name.length < 2) {
+      setErrorMsg("Le nom doit contenir au moins 2 caractères.")
+      setLoading(false)
+      return
+    }
+
     try {
-      const created = await createTrainer(formData)
+      const created = await createTrainer(sanitizedData)
       if (created) {
-        setSuccessMsg(`Formateur ${created.name} enregistré avec succès !`)
+        setSuccessMsg(t.trainerSavedSuccess)
         if (onTrainerAdded) {
           onTrainerAdded(created)
         }
@@ -66,14 +83,14 @@ export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerM
               <UserPlus className="size-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-foreground">Enregistrer un Nouveau Formateur</h3>
-              <p className="text-xs text-muted-foreground">Expertises TechniX & Écosystème UM6P / OCP</p>
+              <h3 className="text-base font-bold text-foreground">{t.addTrainerTitle}</h3>
+              <p className="text-xs text-muted-foreground">{t.addTrainerSubtitle}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+            className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors cursor-pointer"
           >
             <X className="size-4" />
           </button>
@@ -94,7 +111,7 @@ export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerM
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-foreground mb-1">Nom et Prénom *</label>
+            <label className="block text-xs font-semibold text-foreground mb-1">{t.fullNameRequired}</label>
             <input
               type="text"
               required
@@ -106,7 +123,7 @@ export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerM
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-foreground mb-1">Email Professionnel *</label>
+            <label className="block text-xs font-semibold text-foreground mb-1">{t.emailRequired}</label>
             <input
               type="email"
               required
@@ -119,11 +136,11 @@ export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerM
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">Centre d'affectation</label>
+              <label className="block text-xs font-semibold text-foreground mb-1">{t.assignedCenter}</label>
               <select
                 value={formData.center}
                 onChange={(e) => setFormData({ ...formData, center: e.target.value })}
-                className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
               >
                 <option value="Ben Guerir">Ben Guerir</option>
                 <option value="Safi">Safi</option>
@@ -133,11 +150,11 @@ export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerM
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">Domaine d'Activité / Pôle</label>
+              <label className="block text-xs font-semibold text-foreground mb-1">{t.domainPole}</label>
               <select
                 value={formData.domain}
                 onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
-                className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
               >
                 <option value="Digital">Digital</option>
                 <option value="HSE">HSE (Sécurité / Environnement)</option>
@@ -152,16 +169,16 @@ export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerM
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-foreground mb-1">Niveau / Rôle</label>
+            <label className="block text-xs font-semibold text-foreground mb-1">{t.roleLabelText}</label>
             <select
               value={formData.role}
               onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-              className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
             >
-              <option value="Formateur">Formateur</option>
-              <option value="Lead Formateur">Lead Formateur</option>
-              <option value="Formateur Senior">Formateur Senior</option>
-              <option value="Formateur Expert">Formateur Expert</option>
+              <option value="Formateur">{t.trainer}</option>
+              <option value="Lead Formateur">{t.roleLead}</option>
+              <option value="Formateur Senior">{t.roleSenior}</option>
+              <option value="Formateur Expert">{t.roleExpert}</option>
             </select>
           </div>
 
@@ -171,7 +188,7 @@ export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerM
               onClick={onClose}
               className="px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-secondary rounded-lg transition-colors cursor-pointer"
             >
-              Annuler
+              {t.cancel}
             </button>
             <button
               type="submit"
@@ -181,12 +198,12 @@ export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerM
               {loading ? (
                 <>
                   <Loader2 className="size-3.5 animate-spin" />
-                  Enregistrement...
+                  {t.savingProgress}
                 </>
               ) : (
                 <>
                   <Sparkles className="size-3.5" />
-                  Enregistrer dans la BDD
+                  {t.saveTrainer}
                 </>
               )}
             </button>

@@ -11,7 +11,6 @@ export const metadata: Metadata = {
   title: 'Trainer Capacity Hub',
   description:
     'Tableau de bord Super Admin pour la gestion et la planification de la charge des formateurs.',
-  generator: 'v0.app',
   icons: {
     icon: [
       {

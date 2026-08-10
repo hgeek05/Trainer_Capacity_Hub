@@ -24,7 +24,8 @@ def detect_trainer_anomalies(db: Session) -> list[dict]:
                 first_name = getattr(profile, "first_name", "") if profile else ""
                 last_name = getattr(profile, "last_name", "") if profile else ""
                 name = f"{first_name} {last_name}".strip() if (first_name or last_name) else (t.email or f"Formateur #{t.id}")
-                email = t.email or f"{name.lower().replace(' ', '.')}@um6p.ma"
+                raw_email = t.email or f"{name.lower().replace(' ', '.')}@um6p.ma"
+                email = raw_email if raw_email.endswith('@um6p.ma') else f"{raw_email.split('@')[0]}@um6p.ma"
                 global_capacity = 189.0
                 animation_declared = 82.0 + (t.id * 17) % 65
                 absence_days = float((t.id * 5) % 16)

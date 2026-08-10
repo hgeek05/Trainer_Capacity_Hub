@@ -62,6 +62,14 @@ app.include_router(ai_router.router)
 app.include_router(centers.router)
 app.include_router(calendar_router.router)
 
+@app.on_event("startup")
+def startup_db_cleanup():
+    try:
+        from generate_mock_data import fix_all_user_emails
+        fix_all_user_emails()
+    except Exception as e:
+        logger.warning(f"Startup email cleanup notice: {e}")
+
 @app.get("/")
 def read_root():
     return {"status": "API is running", "database": "Connected"}

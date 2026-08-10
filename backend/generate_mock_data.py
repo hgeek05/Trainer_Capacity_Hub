@@ -1,9 +1,15 @@
+import re
+import unicodedata
 from faker import Faker
 from database import SessionLocal
 import models
 
 # Initialisation de Faker (en français pour plus de réalisme)
 fake = Faker('fr_FR')
+
+def slugify(text: str) -> str:
+    text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('utf-8')
+    return re.sub(r'[^a-zA-Z0-9]', '', text).lower()
 
 def create_fake_trainers(n=50):
     db = SessionLocal()
@@ -16,23 +22,38 @@ def create_fake_trainers(n=50):
             db.add(trainer_role)
             db.flush()
 
+        used_emails = set()
+
         for _ in range(n):
-            # Création d'un utilisateur fictif
+            first_name = fake.first_name()
+            last_name = fake.last_name()
+            
+            clean_first = slugify(first_name)
+            clean_last = slugify(last_name)
+            base_email = f"{clean_first}.{clean_last}@um6p.ma"
+            email = base_email
+            counter = 1
+            while email in used_emails or db.query(models.User).filter(models.User.email == email).first():
+                email = f"{clean_first}.{clean_last}{counter}@um6p.ma"
+                counter += 1
+            used_emails.add(email)
+
+            # Création d'un utilisateur fictif avec email @um6p.ma
             user = models.User(
                 employee_id=f"EMP{fake.unique.random_number(digits=4)}",
-                email=fake.unique.company_email(),
+                email=email,
                 password_hash="hashed_password_123", # Simplifié pour l'exemple
                 role_id=trainer_role.id,
                 is_active=True
             )
             db.add(user)
             db.flush() # flush() permet d'obtenir l'ID de l'user avant le commit final
-            # Création du profil associé (si tu as la table Profile dans tes models)
-            # Cette partie dépend des champs exacts de ton models.py
+
+            # Création du profil associé
             profile = models.Profile(
                 user_id=user.id,
-                first_name=fake.first_name(),
-                last_name=fake.last_name(),
+                first_name=first_name,
+                last_name=last_name,
                 job_title="Formateur Interne",
                 hire_date=fake.date_between(start_date='-5y', end_date='today')
             )
@@ -47,6 +68,31 @@ def create_fake_trainers(n=50):
     finally:
         db.close()
 
+def fix_all_user_emails():
+    db = SessionLocal()
+    try:
+        users = db.query(models.User).all()
+        updated_count = 0
+        for u in users:
+            if u.email and not u.email.endswith("@um6p.ma"):
+                prefix = u.email.split("@")[0] if "@" in u.email else u.email
+                prefix = slugify(prefix) or "user"
+                new_email = f"{prefix}@um6p.ma"
+                counter = 1
+                while db.query(models.User).filter(models.User.email == new_email, models.User.id != u.id).first():
+                    new_email = f"{prefix}{counter}@um6p.ma"
+                    counter += 1
+                u.email = new_email
+                updated_count += 1
+        if updated_count > 0:
+            db.commit()
+            print(f"Correction de la base de données : {updated_count} emails mis à jour vers @um6p.ma")
+    except Exception as e:
+        db.rollback()
+        print(f"Erreur lors de la correction des emails dans la DB : {e}")
+    finally:
+        db.close()
+
 if __name__ == "__main__":
-    # Lancement de la fonction lors de l'exécution du script
-    create_fake_trainers(20)
+    fix_all_user_emails()
+    create_fake_trainers(20)

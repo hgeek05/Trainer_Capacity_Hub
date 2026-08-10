@@ -107,6 +107,15 @@ DEFAULT_DEMO_TRAINERS = [
 ]
 
 
+def ensure_um6p_email(email: str | None, name: str = "") -> str:
+    if not email:
+        prefix = name.lower().replace(" ", ".") if name else "formateur"
+        return f"{prefix}@um6p.ma"
+    if not email.endswith("@um6p.ma"):
+        prefix = email.split("@")[0]
+        return f"{prefix}@um6p.ma"
+    return email
+
 @router.get("/")
 def get_trainers(db: Session = Depends(get_db)):
     db_trainers = []
@@ -139,7 +148,7 @@ def get_trainers(db: Session = Depends(get_db)):
                 "id": u.id,
                 "employee_id": u.employee_id or f"EMP{u.id}",
                 "name": name,
-                "email": u.email,
+                "email": ensure_um6p_email(u.email, name),
                 "role": getattr(u.role, 'nom_role', 'Formateur') if u.role else 'Formateur',
                 "center": center_name,
                 "domain": domain_name,

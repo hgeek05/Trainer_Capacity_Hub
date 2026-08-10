@@ -1,10 +1,11 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ArrowRight, CheckCircle2, Sliders, Sparkles, X } from 'lucide-react'
+import { CheckCircle2, Sliders, Sparkles, X } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n'
+import { SimulationImpactCard } from '@/components/dashboard/simulation/simulation-impact-card'
 
-interface TrainerOption {
+export interface TrainerOption {
   name: string
   center: string
   animUsed: number
@@ -25,7 +26,6 @@ export function SimulationModal({
   onApplySimulation,
 }: SimulationModalProps) {
   const { t } = useLanguage()
-
   const [sourceName, setSourceName] = useState<string>('Nadia Amrani')
   const [targetName, setTargetName] = useState<string>('Omar Chraibi')
   const [daysToTransfer, setDaysToTransfer] = useState<number>(20)
@@ -33,33 +33,13 @@ export function SimulationModal({
 
   if (!isOpen) return null
 
-  const sourceTrainer = trainers.find((t) => t.name === sourceName) || trainers[0] || {
-    name: 'Nadia Amrani',
-    center: 'Khouribga',
-    animUsed: 135,
-    animTotal: 107,
-  }
+  const sourceTrainer = trainers.find((tr) => tr.name === sourceName) || trainers[0] || { name: 'Nadia Amrani', center: 'Khouribga', animUsed: 135, animTotal: 107 }
+  const targetTrainer = trainers.find((tr) => tr.name === targetName) || trainers[1] || { name: 'Omar Chraibi', center: 'Ben Guerir', animUsed: 51, animTotal: 107 }
 
-  const targetTrainer = trainers.find((t) => t.name === targetName) || trainers[1] || {
-    name: 'Omar Chraibi',
-    center: 'Ben Guerir',
-    animUsed: 51,
-    animTotal: 107,
-  }
-
-  // Current metrics
   const sourceCurrent = sourceTrainer.animUsed
   const targetCurrent = targetTrainer.animUsed
-
-  // Simulated metrics
   const sourceNew = Math.max(0, sourceCurrent - daysToTransfer)
   const targetNew = targetCurrent + daysToTransfer
-
-  const sourceCurrentDelta = sourceCurrent - 107
-  const sourceNewDelta = sourceNew - 107
-
-  const targetCurrentDelta = targetCurrent - 107
-  const targetNewDelta = targetNew - 107
 
   const handleApply = () => {
     onApplySimulation(sourceName, targetName, daysToTransfer)
@@ -83,11 +63,7 @@ export function SimulationModal({
               <p className="text-xs text-muted-foreground">{t.simSubtitle}</p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors cursor-pointer"
-          >
+          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors cursor-pointer">
             <X className="size-4" />
           </button>
         </div>
@@ -101,108 +77,38 @@ export function SimulationModal({
 
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Formateur Source (Surchargé) */}
             <div className="p-4 rounded-xl border border-rose-500/30 bg-rose-500/5">
-              <label className="block text-xs font-semibold text-rose-700 dark:text-rose-300 mb-1.5">
-                {t.simSourceLabel}
-              </label>
-              <select
-                value={sourceName}
-                onChange={(e) => setSourceName(e.target.value)}
-                className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-rose-500/20 cursor-pointer"
-              >
-                {trainers.map((tr) => (
-                  <option key={tr.name} value={tr.name}>
-                    {tr.name} ({tr.center}) — {tr.animUsed}{t.days}
-                  </option>
-                ))}
+              <label className="block text-xs font-semibold text-rose-700 dark:text-rose-300 mb-1.5">{t.simSourceLabel}</label>
+              <select value={sourceName} onChange={(e) => setSourceName(e.target.value)} className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold text-foreground focus:outline-none cursor-pointer">
+                {trainers.map((tr) => (<option key={tr.name} value={tr.name}>{tr.name} ({tr.center}) — {tr.animUsed}{t.days}</option>))}
               </select>
             </div>
 
-            {/* Formateur Cible (Disponible) */}
             <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/5">
-              <label className="block text-xs font-semibold text-emerald-700 dark:text-emerald-300 mb-1.5">
-                {t.simTargetLabel}
-              </label>
-              <select
-                value={targetName}
-                onChange={(e) => setTargetName(e.target.value)}
-                className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer"
-              >
-                {trainers.map((tr) => (
-                  <option key={tr.name} value={tr.name}>
-                    {tr.name} ({tr.center}) — {tr.animUsed}{t.days}
-                  </option>
-                ))}
+              <label className="block text-xs font-semibold text-emerald-700 dark:text-emerald-300 mb-1.5">{t.simTargetLabel}</label>
+              <select value={targetName} onChange={(e) => setTargetName(e.target.value)} className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold text-foreground focus:outline-none cursor-pointer">
+                {trainers.map((tr) => (<option key={tr.name} value={tr.name}>{tr.name} ({tr.center}) — {tr.animUsed}{t.days}</option>))}
               </select>
             </div>
           </div>
 
-          {/* Slider de transfert */}
           <div className="p-4 rounded-xl border border-border bg-secondary/30">
             <div className="flex justify-between items-center text-xs mb-2">
               <span className="font-semibold text-foreground">{t.simVolumeLabel}</span>
               <span className="font-bold text-primary text-sm font-mono">{daysToTransfer} {t.daysCount}</span>
             </div>
-            <input
-              type="range"
-              min={5}
-              max={40}
-              step={5}
-              value={daysToTransfer}
-              onChange={(e) => setDaysToTransfer(Number(e.target.value))}
-              className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
-            />
-            <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
-              <span>5 {t.days}</span>
-              <span>20 {t.days}</span>
-              <span>40 {t.days}</span>
-            </div>
+            <input type="range" min={5} max={40} step={5} value={daysToTransfer} onChange={(e) => setDaysToTransfer(Number(e.target.value))} className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary" />
           </div>
 
-          {/* Comparatif visuel Avant / Après */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            {/* Impact Source */}
-            <div className="p-3.5 rounded-xl border border-border bg-card text-xs space-y-2">
-              <p className="font-bold text-foreground flex items-center gap-1.5">
-                <span>{sourceName}</span>
-                <span className="text-[10px] text-muted-foreground">({sourceTrainer.center})</span>
-              </p>
-              <div className="flex items-center justify-between text-muted-foreground">
-                <span>{t.vsLastPeriod.split(' ')[0]} : <strong className="text-rose-600">{sourceCurrent}{t.days}</strong> (+{sourceCurrentDelta}{t.days})</span>
-                <ArrowRight className="size-3.5 text-muted-foreground" />
-                <span>Après : <strong className="text-emerald-600">{sourceNew}{t.days}</strong> ({sourceNewDelta >= 0 ? `+${sourceNewDelta}${t.days}` : `${sourceNewDelta}${t.days}`})</span>
-              </div>
-            </div>
-
-            {/* Impact Cible */}
-            <div className="p-3.5 rounded-xl border border-border bg-card text-xs space-y-2">
-              <p className="font-bold text-foreground flex items-center gap-1.5">
-                <span>{targetName}</span>
-                <span className="text-[10px] text-muted-foreground">({targetTrainer.center})</span>
-              </p>
-              <div className="flex items-center justify-between text-muted-foreground">
-                <span>{t.vsLastPeriod.split(' ')[0]} : <strong className="text-emerald-600">{targetCurrent}{t.days}</strong> ({targetCurrentDelta}{t.days})</span>
-                <ArrowRight className="size-3.5 text-muted-foreground" />
-                <span>Après : <strong className="text-primary font-bold">{targetNew}{t.days}</strong> ({targetNewDelta}{t.days})</span>
-              </div>
-            </div>
+            <SimulationImpactCard name={sourceName} center={sourceTrainer.center} currentDays={sourceCurrent} newDays={sourceNew} currentDelta={sourceCurrent - 107} newDelta={sourceNew - 107} labelBefore={t.vsLastPeriod.split(' ')[0]} isSource={true} />
+            <SimulationImpactCard name={targetName} center={targetTrainer.center} currentDays={targetCurrent} newDays={targetNew} currentDelta={targetCurrent - 107} newDelta={targetNew - 107} labelBefore={t.vsLastPeriod.split(' ')[0]} isSource={false} />
           </div>
         </div>
 
         <div className="flex items-center justify-end gap-2.5 pt-5 border-t border-border mt-5">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-secondary rounded-lg transition-colors cursor-pointer"
-          >
-            {t.cancel}
-          </button>
-          <button
-            type="button"
-            onClick={handleApply}
-            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-primary-foreground bg-purple-600 hover:bg-purple-700 rounded-lg shadow-sm transition-all cursor-pointer"
-          >
+          <button onClick={onClose} className="px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-secondary rounded-lg transition-colors cursor-pointer">{t.cancel}</button>
+          <button onClick={handleApply} className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-primary-foreground bg-purple-600 hover:bg-purple-700 rounded-lg shadow-sm transition-all cursor-pointer">
             <Sparkles className="size-3.5" />
             {t.simApplyBtn}
           </button>

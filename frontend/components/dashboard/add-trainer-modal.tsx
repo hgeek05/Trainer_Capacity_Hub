@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { Building2, CheckCircle2, Loader2, Sparkles, UserPlus, X } from 'lucide-react'
+import React, { useState } from 'react'
+import { CheckCircle2, Loader2, Sparkles, UserPlus, X } from 'lucide-react'
 import { createTrainer, type TrainerApiData } from '@/lib/api'
 import { useLanguage } from '@/lib/i18n'
+import { TrainerFormFields, type TrainerFormData } from '@/components/dashboard/add-trainer/trainer-form-fields'
 
 interface AddTrainerModalProps {
   isOpen: boolean
@@ -14,7 +15,7 @@ interface AddTrainerModalProps {
 export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerModalProps) {
   const { t } = useLanguage()
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<TrainerFormData>({
     name: '',
     email: '',
     center: 'Ben Guerir',
@@ -43,7 +44,7 @@ export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerM
     }
 
     if (sanitizedData.name.length < 2) {
-      setErrorMsg("Le nom doit contenir au moins 2 caractères.")
+      setErrorMsg('Le nom doit contenir au moins 2 caractères.')
       setLoading(false)
       return
     }
@@ -52,23 +53,15 @@ export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerM
       const created = await createTrainer(sanitizedData)
       if (created) {
         setSuccessMsg(t.trainerSavedSuccess)
-        if (onTrainerAdded) {
-          onTrainerAdded(created)
-        }
+        if (onTrainerAdded) onTrainerAdded(created)
         setTimeout(() => {
           setSuccessMsg(null)
           onClose()
-          setFormData({
-            name: '',
-            email: '',
-            center: 'Ben Guerir',
-            domain: 'Digital',
-            role: 'Formateur',
-          })
+          setFormData({ name: '', email: '', center: 'Ben Guerir', domain: 'Digital', role: 'Formateur' })
         }, 1200)
       }
     } catch (err: any) {
-      setErrorMsg(err?.message || "Erreur de connexion avec le backend FastAPI.")
+      setErrorMsg(err?.message || 'Erreur de connexion avec le backend FastAPI.')
     } finally {
       setLoading(false)
     }
@@ -87,21 +80,12 @@ export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerM
               <p className="text-xs text-muted-foreground">{t.addTrainerSubtitle}</p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors cursor-pointer"
-          >
+          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors cursor-pointer">
             <X className="size-4" />
           </button>
         </div>
 
-        {errorMsg && (
-          <div className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs font-medium text-rose-700 dark:text-rose-300">
-            ⚠️ {errorMsg}
-          </div>
-        )}
-
+        {errorMsg && <div className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs font-medium text-rose-700 dark:text-rose-300">⚠️ {errorMsg}</div>}
         {successMsg && (
           <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
             <CheckCircle2 className="size-4 text-emerald-500" />
@@ -110,84 +94,10 @@ export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerM
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-foreground mb-1">{t.fullNameRequired}</label>
-            <input
-              type="text"
-              required
-              placeholder="Ex: Fatima Ait Zzi"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full h-9 px-3 rounded-lg border border-border bg-secondary/50 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-foreground mb-1">{t.emailRequired}</label>
-            <input
-              type="email"
-              required
-              placeholder="f.aitzzi@technix.ma"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full h-9 px-3 rounded-lg border border-border bg-secondary/50 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">{t.assignedCenter}</label>
-              <select
-                value={formData.center}
-                onChange={(e) => setFormData({ ...formData, center: e.target.value })}
-                className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
-              >
-                <option value="Ben Guerir">Ben Guerir</option>
-                <option value="Safi">Safi</option>
-                <option value="Jorf Lasfar">Jorf Lasfar</option>
-                <option value="Khouribga">Khouribga</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">{t.domainPole}</label>
-              <select
-                value={formData.domain}
-                onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
-                className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
-              >
-                <option value="Digital">Digital</option>
-                <option value="HSE">HSE (Sécurité / Environnement)</option>
-                <option value="Maintenance industrielle">Maintenance industrielle</option>
-                <option value="Chimie et procédés">Chimie et procédés</option>
-                <option value="Industrie minière">Industrie minière</option>
-                <option value="Énergies renouvelables">Énergies renouvelables</option>
-                <option value="Agriculture">Agriculture</option>
-                <option value="Soft Skills">Soft Skills</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-foreground mb-1">{t.roleLabelText}</label>
-            <select
-              value={formData.role}
-              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-              className="w-full h-9 px-3 rounded-lg border border-border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
-            >
-              <option value="Formateur">{t.trainer}</option>
-              <option value="Lead Formateur">{t.roleLead}</option>
-              <option value="Formateur Senior">{t.roleSenior}</option>
-              <option value="Formateur Expert">{t.roleExpert}</option>
-            </select>
-          </div>
+          <TrainerFormFields formData={formData} onChange={setFormData} />
 
           <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-border">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-secondary rounded-lg transition-colors cursor-pointer"
-            >
+            <button onClick={onClose} type="button" className="px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-secondary rounded-lg transition-colors cursor-pointer">
               {t.cancel}
             </button>
             <button
@@ -195,17 +105,7 @@ export function AddTrainerModal({ isOpen, onClose, onTrainerAdded }: AddTrainerM
               disabled={loading}
               className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-primary-foreground bg-primary hover:opacity-90 rounded-lg shadow-sm transition-all cursor-pointer disabled:opacity-50"
             >
-              {loading ? (
-                <>
-                  <Loader2 className="size-3.5 animate-spin" />
-                  {t.savingProgress}
-                </>
-              ) : (
-                <>
-                  <Sparkles className="size-3.5" />
-                  {t.saveTrainer}
-                </>
-              )}
+              {loading ? <><Loader2 className="size-3.5 animate-spin" />{t.savingProgress}</> : <><Sparkles className="size-3.5" />{t.saveTrainer}</>}
             </button>
           </div>
         </form>

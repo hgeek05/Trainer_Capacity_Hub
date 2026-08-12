@@ -8,6 +8,10 @@ export interface PlanningSession {
   endDate: string
   durationDays: number
   status: 'CONFIRMED' | 'IN_PROGRESS' | 'SCHEDULED'
+  /** Salle d'animation affectée sur le site. Optionnel : une session peut être planifiée avant réservation. */
+  room?: string
+  /** Co-formateur en binôme sur la session. Optionnel : la plupart des modules sont animés seuls. */
+  coTrainerName?: string
 }
 
 export const INITIAL_SESSIONS: PlanningSession[] = [
@@ -21,6 +25,8 @@ export const INITIAL_SESSIONS: PlanningSession[] = [
     endDate: '2026-08-14',
     durationDays: 5,
     status: 'IN_PROGRESS',
+    room: 'Amphi Al Khwarizmi',
+    coTrainerName: 'Youssef Benali',
   },
   {
     id: 'SES-2026-02',
@@ -32,6 +38,7 @@ export const INITIAL_SESSIONS: PlanningSession[] = [
     endDate: '2026-08-19',
     durationDays: 7,
     status: 'CONFIRMED',
+    room: 'Atelier Pilote Chimie',
   },
   {
     id: 'SES-2026-03',
@@ -43,6 +50,8 @@ export const INITIAL_SESSIONS: PlanningSession[] = [
     endDate: '2026-08-20',
     durationDays: 5,
     status: 'SCHEDULED',
+    room: 'Atelier Mécanique JL1',
+    coTrainerName: 'Omar Chraibi',
   },
   {
     id: 'SES-2026-04',
@@ -54,6 +63,7 @@ export const INITIAL_SESSIONS: PlanningSession[] = [
     endDate: '2026-08-28',
     durationDays: 6,
     status: 'SCHEDULED',
+    room: 'Atelier Digital Lab',
   },
   {
     id: 'SES-2026-05',
@@ -65,6 +75,7 @@ export const INITIAL_SESSIONS: PlanningSession[] = [
     endDate: '2026-08-29',
     durationDays: 4,
     status: 'CONFIRMED',
+    room: 'Salle Innovation A1',
   },
   {
     id: 'SES-2026-06',
@@ -76,5 +87,7 @@ export const INITIAL_SESSIONS: PlanningSession[] = [
     endDate: '2026-09-10',
     durationDays: 8,
     status: 'CONFIRMED',
+    room: 'Salle Extraction 1',
+    coTrainerName: 'Karim Tazi',
   },
 ]

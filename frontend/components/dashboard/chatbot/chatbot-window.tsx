@@ -35,7 +35,8 @@ export function ChatbotWindow({
 }: ChatbotWindowProps) {
   return (
     <div className="w-80 sm:w-96 rounded-2xl border border-border bg-card shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-150">
-      <div className="bg-purple-600 text-white p-3.5 flex items-center justify-between">
+      {/* HEADER BAR IN DARK PURPLE #5b0dbc */}
+      <div className="bg-[#5b0dbc] text-white p-3.5 flex items-center justify-between border-b border-white/10">
         <div className="flex items-center gap-2.5">
           <div className="flex size-8 items-center justify-center rounded-xl bg-white/20">
             <Bot className="size-4.5 text-white" />
@@ -64,28 +65,28 @@ export function ChatbotWindow({
             className={`flex gap-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {msg.sender === 'bot' && (
-              <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-purple-600/10 text-purple-600 mt-1">
+              <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#5b0dbc]/10 text-[#5b0dbc] dark:text-[#a87bf0] mt-1">
                 <Bot className="size-3.5" />
               </div>
             )}
             <div
               className={`max-w-[82%] p-3 rounded-xl leading-relaxed whitespace-pre-line text-xs ${
                 msg.sender === 'user'
-                  ? 'bg-purple-600 text-white rounded-br-none shadow-xs'
+                  ? 'bg-[#5b0dbc] text-white rounded-br-none shadow-xs font-semibold'
                   : 'bg-card text-foreground border border-border/80 rounded-bl-none shadow-2xs font-medium'
               }`}
             >
               {msg.text}
               <span
                 className={`block text-[9px] mt-1 font-mono ${
-                  msg.sender === 'user' ? 'text-purple-200 text-right' : 'text-muted-foreground'
+                  msg.sender === 'user' ? 'text-purple-100 text-right' : 'text-muted-foreground'
                 }`}
               >
                 {msg.timestamp}
               </span>
             </div>
             {msg.sender === 'user' && (
-              <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary mt-1">
+              <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#d6492a]/10 text-[#d6492a] mt-1">
                 <User className="size-3.5" />
               </div>
             )}
@@ -100,11 +101,11 @@ export function ChatbotWindow({
           placeholder={botPlaceholder}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          className="flex-1 h-9 px-3 rounded-lg border border-border bg-secondary/50 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-600/20"
+          className="flex-1 h-9 px-3 rounded-lg border border-border bg-secondary/50 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#5b0dbc]/20"
         />
         <button
           type="submit"
-          className="flex h-9 items-center justify-center gap-1 bg-purple-600 hover:bg-purple-700 text-white px-3.5 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+          className="flex h-9 items-center justify-center gap-1 bg-[#5b0dbc] hover:bg-[#4a0a9c] text-white px-3.5 rounded-lg text-xs font-bold transition-colors cursor-pointer"
         >
           <Send className="size-3.5" />
         </button>

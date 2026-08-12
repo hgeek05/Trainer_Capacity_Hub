@@ -1,16 +1,18 @@
 'use client'
 
 import React from 'react'
-import { Clock, MapPin, Sparkles, UserCheck } from 'lucide-react'
+import { Clock, DoorOpen, MapPin, Pencil, Sparkles, UserCheck, Users } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 import type { PlanningSession } from './planning-data'
 
 interface PlanningTableProps {
   sessions: PlanningSession[]
+  /** Ouvre le modal d'édition. La colonne Actions n'apparaît que si le handler est fourni. */
+  onEditSession?: (session: PlanningSession) => void
 }
 
-export function PlanningTable({ sessions }: PlanningTableProps) {
+export function PlanningTable({ sessions, onEditSession }: PlanningTableProps) {
   const { t, lang } = useLanguage()
 
   return (
@@ -26,6 +28,7 @@ export function PlanningTable({ sessions }: PlanningTableProps) {
             <th className="px-4 py-3">{t.period}</th>
             <th className="px-4 py-3">{t.days}</th>
             <th className="px-4 py-3">{t.status}</th>
+            {onEditSession && <th className="px-4 py-3 text-right">{t.actions}</th>}
           </tr>
         </thead>
         <tbody className="divide-y divide-border/60 bg-card">
@@ -38,6 +41,12 @@ export function PlanningTable({ sessions }: PlanningTableProps) {
                   <UserCheck className="size-3.5 text-purple-600" />
                   {session.trainerName}
                 </span>
+                {session.coTrainerName && (
+                  <span className="mt-0.5 flex items-center gap-1.5 text-[10px] font-normal text-muted-foreground">
+                    <Users className="size-2.5" />
+                    {session.coTrainerName}
+                  </span>
+                )}
               </td>
               <td className="px-4 py-3">
                 <span className="inline-flex items-center gap-1 rounded-md bg-purple-600/10 px-2 py-0.5 text-[11px] font-bold text-purple-700 dark:text-purple-300">
@@ -50,6 +59,12 @@ export function PlanningTable({ sessions }: PlanningTableProps) {
                   <MapPin className="size-3 text-rose-500" />
                   {session.center}
                 </span>
+                {session.room && (
+                  <span className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground/80">
+                    <DoorOpen className="size-2.5" />
+                    {session.room}
+                  </span>
+                )}
               </td>
               <td className="px-4 py-3 text-muted-foreground font-mono text-[11px]">
                 {session.startDate} ➔ {session.endDate}
@@ -70,6 +85,19 @@ export function PlanningTable({ sessions }: PlanningTableProps) {
                   {session.status === 'IN_PROGRESS' ? (lang === 'en' ? 'Ongoing' : 'En Cours') : session.status === 'CONFIRMED' ? (lang === 'en' ? 'Confirmed' : 'Confirmé') : (lang === 'en' ? 'Scheduled' : 'Planifié')}
                 </span>
               </td>
+              {onEditSession && (
+                <td className="px-4 py-3 text-right">
+                  <button
+                    type="button"
+                    onClick={() => onEditSession(session)}
+                    aria-label={`${t.edit} ${session.id}`}
+                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-secondary px-2.5 py-1.5 text-[11px] font-semibold text-foreground transition-colors hover:border-purple-600/40 hover:bg-purple-600/10 hover:text-purple-700 dark:hover:text-purple-300"
+                  >
+                    <Pencil className="size-3" />
+                    {t.edit}
+                  </button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

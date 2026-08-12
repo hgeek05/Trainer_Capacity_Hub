@@ -8,14 +8,28 @@ import random
 router = APIRouter(prefix="/trainers", tags=["Trainers"])
 
 
-def _format_stub():
-    # small helper to produce placeholder fields used by the frontend example
+def _calculate_trainer_metrics(user_id: int):
+    # Produce unique, realistic workload metrics per trainer based on user_id
+    base_anim = (user_id * 37 + 53) % 95 + 45  # ranges between 45j and 139j
+    global_days_num = min(base_anim + ((user_id * 19) % 35 + 30), 188)
+    taux = round((base_anim / 107.0) * 100)
+
+    if base_anim > 125:
+        alerte = "BLOCKED"
+        statut_fenetre = "Critique"
+    elif base_anim >= 108:
+        alerte = "WATCH"
+        statut_fenetre = "Vigilance"
+    else:
+        alerte = "OK"
+        statut_fenetre = "Normale"
+
     return {
-        "global_days": "142/189 j",
-        "animation_days": "82/107 j",
-        "statut_fenetre": "Normale",
-        "taux": 76,
-        "alerte": "OK",
+        "global_days": f"{global_days_num}/189 j",
+        "animation_days": f"{base_anim}/107 j",
+        "statut_fenetre": statut_fenetre,
+        "taux": taux,
+        "alerte": alerte,
     }
 
 
@@ -44,7 +58,7 @@ DEFAULT_DEMO_TRAINERS = [
         "domain": "HSE",
         "global_days": "168/189 j",
         "animation_days": "120/107 j",
-        "statut_fenetre": "Critique",
+        "statut_fenetre": "Vigilance",
         "taux": 89,
         "alerte": "WATCH",
     },
@@ -100,7 +114,7 @@ DEFAULT_DEMO_TRAINERS = [
         "domain": "Soft Skills",
         "global_days": "157/189 j",
         "animation_days": "112/107 j",
-        "statut_fenetre": "Normale",
+        "statut_fenetre": "Vigilance",
         "taux": 83,
         "alerte": "WATCH",
     },
@@ -115,6 +129,7 @@ def ensure_um6p_email(email: str | None, name: str = "") -> str:
         prefix = email.split("@")[0]
         return f"{prefix}@um6p.ma"
     return email
+
 
 @router.get("/")
 def get_trainers(db: Session = Depends(get_db)):
@@ -137,7 +152,7 @@ def get_trainers(db: Session = Depends(get_db)):
             profile = getattr(u, "profile", None)
             first_name = getattr(profile, "first_name", "") if profile else ""
             last_name = getattr(profile, "last_name", "") if profile else ""
-            name = f"{first_name} {last_name}".strip() if (first_name or last_name) else (u.email or f"Formateur #{u.id}")
+            name = f"{first_name} {last_name}".strip() if (first_name or last_name) else (u.email.split("@")[0].replace(".", " ").title() if u.email else f"Formateur #{u.id}")
             center_obj = getattr(profile, "center", None) if profile else None
             center_name = getattr(center_obj, "nom_centre", None) if center_obj else None
             if not center_name or center_name not in OFFICIAL_CENTERS:
@@ -153,7 +168,7 @@ def get_trainers(db: Session = Depends(get_db)):
                 "center": center_name,
                 "domain": domain_name,
             }
-            item.update(_format_stub())
+            item.update(_calculate_trainer_metrics(u.id))
             db_trainers.append(item)
     except Exception as e:
         print("Database error in get_trainers:", e)
@@ -170,18 +185,15 @@ def get_trainers(db: Session = Depends(get_db)):
 
 @router.post("/")
 def create_trainer(trainer: schemas.TrainerCreate, db: Session = Depends(get_db)):
-    # simple uniqueness check
     if db.query(models.User).filter(models.User.email == trainer.email).first():
         raise HTTPException(status_code=400, detail="Email déjà enregistré")
 
-    # ensure role exists
     role = db.query(models.Role).filter(models.Role.nom_role == (trainer.role or "Formateur")).first()
     if role is None:
         role = models.Role(nom_role=trainer.role or "Formateur")
         db.add(role)
         db.flush()
 
-    # ensure center exists or map
     center_obj = None
     if trainer.center:
         center_obj = db.query(models.Center).filter(models.Center.nom_centre == trainer.center).first()
@@ -191,7 +203,6 @@ def create_trainer(trainer: schemas.TrainerCreate, db: Session = Depends(get_db)
     center_id = center_obj.id if center_obj else 1
     center_name = center_obj.nom_centre if center_obj else (trainer.center or "Ben Guerir")
 
-    # employee id generated if not provided
     employee_id = f"EMP{random.randint(1000,9999)}"
 
     new_user = models.User(
@@ -204,7 +215,6 @@ def create_trainer(trainer: schemas.TrainerCreate, db: Session = Depends(get_db)
     db.add(new_user)
     db.flush()
 
-    # split name into first/last as best-effort
     if " " in trainer.name:
         first, last = trainer.name.split(" ", 1)
     else:
@@ -227,5 +237,5 @@ def create_trainer(trainer: schemas.TrainerCreate, db: Session = Depends(get_db)
         "role": trainer.role or "Formateur",
         "center": center_name,
         "domain": trainer.domain or "Digital",
-        **_format_stub(),
+        **_calculate_trainer_metrics(new_user.id),
     }

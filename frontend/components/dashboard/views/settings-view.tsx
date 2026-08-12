@@ -1,7 +1,11 @@
 'use client'
 
-import { Sliders } from 'lucide-react'
+import { Building2, DoorOpen, Sliders, Sparkles } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n'
+import {
+  TECHNIX_SITES,
+  TRAINING_DOMAINS,
+} from '@/components/dashboard/planning/planning-reference'
 
 export function SettingsView() {
   const { t } = useLanguage()
@@ -51,8 +55,71 @@ export function SettingsView() {
             <p className="text-xs text-muted-foreground">Périmètre géographique restreint aux 4 centres officiels.</p>
           </div>
           <span className="text-xs font-semibold text-primary bg-primary/10 border border-primary/20 px-3 py-1.5 rounded-lg">
-            Ben Guerir, Safi, Jorf Lasfar, Khouribga
+            {TECHNIX_SITES.map((site) => site.name).join(', ')}
           </span>
+        </div>
+      </div>
+
+      {/* Référentiel : sites, salles et domaines */}
+      <div className="space-y-4 border-t border-border pt-6">
+        <div>
+          <h3 className="flex items-center gap-2 text-sm font-bold text-foreground">
+            <Building2 className="size-4 text-primary" />
+            {t.referenceDataTitle}
+          </h3>
+          <p className="mt-1 text-xs text-muted-foreground">{t.referenceDataSubtitle}</p>
+        </div>
+
+        <div>
+          <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            {t.sitesAndRoomsLabel}
+          </p>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {TECHNIX_SITES.map((site) => (
+              <div key={site.id} className="rounded-xl border border-border bg-secondary/30 p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-foreground">{site.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">{site.role}</p>
+                  </div>
+                  <span className="shrink-0 rounded-md border border-primary/20 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                    {site.rooms.length} {t.roomsCountLabel}
+                  </span>
+                </div>
+                <ul className="mt-3 flex flex-wrap gap-1.5">
+                  {site.rooms.map((room) => (
+                    <li
+                      key={room}
+                      className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
+                    >
+                      <DoorOpen className="size-2.5" />
+                      {room}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-border bg-secondary/30 p-4">
+          <div className="flex items-start justify-between gap-2">
+            <p className="text-sm font-semibold text-foreground">{t.domainsCatalogLabel}</p>
+            <span className="shrink-0 rounded-md border border-purple-500/20 bg-purple-500/10 px-2 py-0.5 text-[10px] font-bold text-purple-700 dark:text-purple-300">
+              {TRAINING_DOMAINS.length} {t.domainsCountLabel}
+            </span>
+          </div>
+          <ul className="mt-3 flex flex-wrap gap-1.5">
+            {TRAINING_DOMAINS.map((domain) => (
+              <li
+                key={domain}
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-2 py-0.5 text-[11px] font-semibold text-foreground"
+              >
+                <Sparkles className="size-2.5 text-purple-600" />
+                {domain}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>

@@ -5,7 +5,7 @@ import React from 'react'
 interface Shortcut {
   idx: number
   label: string
-  color: string
+  color?: 'amber' | 'rose' | string
 }
 
 interface CalendarShortcutsProps {
@@ -23,25 +23,30 @@ export function CalendarShortcuts({
 }: CalendarShortcutsProps) {
   return (
     <div className="flex flex-wrap items-center gap-1.5 mb-3">
-      <span className="text-[10px] font-bold text-muted-foreground uppercase mr-1">{label}</span>
-      {shortcuts.map((s) => (
-        <button
-          key={s.idx}
-          type="button"
-          onClick={() => onJumpToMonth(s.idx)}
-          className={`px-2 py-0.5 rounded-full text-[10px] font-bold border cursor-pointer transition-all ${
-            currentMonth === s.idx
-              ? s.color === 'amber'
-                ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
-                : 'bg-rose-500 text-white border-rose-600 shadow-xs'
-              : s.color === 'amber'
-                ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
-                : 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/30 hover:bg-rose-500/20'
-          }`}
-        >
-          {s.label}
-        </button>
-      ))}
+      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mr-1">{label}</span>
+      {shortcuts.map((s) => {
+        const isSelected = currentMonth === s.idx
+        const isReligious = s.color === 'amber'
+        return (
+          <button
+            key={s.idx}
+            type="button"
+            onClick={() => onJumpToMonth(s.idx)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
+              isSelected
+                ? 'bg-secondary border-foreground/40 text-foreground font-bold shadow-xs'
+                : 'bg-card border-border text-foreground hover:bg-secondary'
+            }`}
+          >
+            <span
+              className={`size-1.5 rounded-full ${
+                isReligious ? 'bg-[#d6492a]' : 'bg-[#1e1b4b] dark:bg-slate-300'
+              }`}
+            />
+            {s.label}
+          </button>
+        )
+      })}
     </div>
   )
 }

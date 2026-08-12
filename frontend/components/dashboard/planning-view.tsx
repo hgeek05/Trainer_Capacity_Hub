@@ -3,10 +3,12 @@
 import React, { useState } from 'react'
 import { Calendar, Plus, Search } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n'
+import { EditSessionModal } from '@/components/dashboard/planning/edit-session-modal'
 import { PlanningKpis } from '@/components/dashboard/planning/planning-kpis'
 import { PlanningSessionModal } from '@/components/dashboard/planning/planning-session-modal'
 import { PlanningTable } from '@/components/dashboard/planning/planning-table'
 import { INITIAL_SESSIONS, type PlanningSession } from '@/components/dashboard/planning/planning-data'
+import { CENTER_NAMES, TRAINING_DOMAINS } from '@/components/dashboard/planning/planning-reference'
 
 export type { PlanningSession }
 
@@ -17,6 +19,7 @@ export function PlanningView() {
   const [selectedCenter, setSelectedCenter] = useState('ALL')
   const [selectedDomain, setSelectedDomain] = useState('ALL')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingSession, setEditingSession] = useState<PlanningSession | null>(null)
   const [notification, setNotification] = useState<string | null>(null)
 
   const filteredSessions = sessions.filter((s) => {
@@ -32,6 +35,12 @@ export function PlanningView() {
   const handleAddSession = (newSession: PlanningSession) => {
     setSessions((prev) => [newSession, ...prev])
     setNotification(`✅ Session "${newSession.title}" ${t.scheduledSuccessfully} ${newSession.trainerName} !`)
+    setTimeout(() => setNotification(null), 4000)
+  }
+
+  const handleUpdateSession = (updated: PlanningSession) => {
+    setSessions((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))
+    setNotification(`✅ Session "${updated.title}" ${t.sessionUpdatedSuccessfully} — ${updated.trainerName}`)
     setTimeout(() => setNotification(null), 4000)
   }
 
@@ -84,11 +93,14 @@ export function PlanningView() {
             onChange={(e) => setSelectedCenter(e.target.value)}
             className="h-8.5 rounded-lg border border-border bg-card px-3 text-xs text-foreground font-medium focus:outline-none cursor-pointer"
           >
-            <option value="ALL">{t.allCenters} (4)</option>
-            <option value="Ben Guerir">Ben Guerir</option>
-            <option value="Safi">Safi</option>
-            <option value="Jorf Lasfar">Jorf Lasfar</option>
-            <option value="Khouribga">Khouribga</option>
+            <option value="ALL">
+              {t.allCenters} ({CENTER_NAMES.length})
+            </option>
+            {CENTER_NAMES.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
           </select>
 
           <select
@@ -97,23 +109,28 @@ export function PlanningView() {
             className="h-8.5 rounded-lg border border-border bg-card px-3 text-xs text-foreground font-medium focus:outline-none cursor-pointer"
           >
             <option value="ALL">{t.allDomains}</option>
-            <option value="HSE">HSE</option>
-            <option value="Digital">Digital</option>
-            <option value="Maintenance industrielle">Maintenance industrielle</option>
-            <option value="Chimie et procédés">Chimie et procédés</option>
-            <option value="Industrie minière">Industrie minière</option>
-            <option value="Soft Skills">Soft Skills</option>
+            {TRAINING_DOMAINS.map((domain) => (
+              <option key={domain} value={domain}>
+                {domain}
+              </option>
+            ))}
           </select>
         </div>
       </div>
 
-      <PlanningTable sessions={filteredSessions} />
+      <PlanningTable sessions={filteredSessions} onEditSession={setEditingSession} />
 
       <PlanningSessionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onAddSession={handleAddSession}
         nextId={nextSessionId}
+      />
+
+      <EditSessionModal
+        session={editingSession}
+        onClose={() => setEditingSession(null)}
+        onSave={handleUpdateSession}
       />
     </div>
   )

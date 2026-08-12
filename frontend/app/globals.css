@@ -6,6 +6,9 @@
 
 @theme inline {
   --font-sans: 'Geist', 'Geist Fallback', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --color-brand-orange: #d6492a;
+  --color-brand-purple: #5b0dbc;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -39,8 +42,6 @@
   --color-background: var(--background);
   --color-pastel-green: var(--pastel-green);
   --color-pastel-green-foreground: var(--pastel-green-foreground);
-  --color-pastel-red: var(--pastel-red);
-  --color-pastel-red-foreground: var(--pastel-red-foreground);
   --color-pastel-blue: var(--pastel-blue);
   --color-pastel-blue-foreground: var(--pastel-blue-foreground);
   --color-pastel-purple: var(--pastel-purple);
@@ -64,36 +65,29 @@
   --card-foreground: oklch(0.205 0.005 100);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.205 0.005 100);
-  --primary: oklch(0.205 0.005 100);
+  --primary: #d6492a;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.955 0.003 100);
   --secondary-foreground: oklch(0.28 0.005 100);
   --muted: oklch(0.955 0.003 100);
   --muted-foreground: oklch(0.55 0.008 100);
-  --accent: oklch(0.94 0.004 100);
-  --accent-foreground: oklch(0.205 0.005 100);
-  --destructive: oklch(0.577 0.245 27.325);
+  --accent: #5b0dbc;
+  --accent-foreground: oklch(1 0 0);
+  --destructive: #1e1b4b;
   --border: oklch(0.918 0.003 100);
   --input: oklch(0.918 0.003 100);
-  --ring: oklch(0.65 0.01 100);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --ring: #d6492a;
   --radius: 0.75rem;
   --sidebar: oklch(0.965 0.018 60);
   --sidebar-foreground: oklch(0.46 0.045 50);
-  --sidebar-primary: oklch(0.63 0.185 42);
+  --sidebar-primary: #d6492a;
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(1 0 0);
   --sidebar-accent-foreground: oklch(0.205 0.005 100);
   --sidebar-border: oklch(0.905 0.025 58);
-  --sidebar-ring: oklch(0.63 0.185 42);
+  --sidebar-ring: #d6492a;
   --pastel-green: oklch(0.94 0.05 160);
   --pastel-green-foreground: oklch(0.42 0.1 160);
-  --pastel-red: oklch(0.93 0.04 25);
-  --pastel-red-foreground: oklch(0.5 0.15 25);
   --pastel-blue: oklch(0.94 0.035 240);
   --pastel-blue-foreground: oklch(0.45 0.1 250);
   --pastel-purple: oklch(0.93 0.045 295);
@@ -110,40 +104,28 @@
   --card-foreground: oklch(0.96 0 0);
   --popover: oklch(0.205 0.004 100);
   --popover-foreground: oklch(0.96 0 0);
-  --primary: oklch(0.93 0 0);
-  --primary-foreground: oklch(0.185 0.004 100);
+  --primary: #d6492a;
+  --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.26 0.004 100);
   --secondary-foreground: oklch(0.93 0 0);
   --muted: oklch(0.26 0.004 100);
   --muted-foreground: oklch(0.7 0.005 100);
-  --accent: oklch(0.28 0.004 100);
+  --accent: #5b0dbc;
   --accent-foreground: oklch(0.96 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: #1e1b4b;
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --ring: #d6492a;
   --sidebar: oklch(0.185 0.004 100);
   --sidebar-foreground: oklch(0.72 0.005 100);
-
-  /* Orange pour les éléments actifs */
-  --sidebar-primary: oklch(0.67 0.17 43);
+  --sidebar-primary: #d6492a;
   --sidebar-primary-foreground: oklch(0.985 0 0);
-
-  /* Orange foncé au survol */
   --sidebar-accent: oklch(0.32 0.08 45);
   --sidebar-accent-foreground: oklch(0.98 0.01 60);
-
   --sidebar-border: oklch(1 0 0 / 8%);
-  --sidebar-ring: oklch(0.67 0.17 43);
+  --sidebar-ring: #d6492a;
   --pastel-green: oklch(0.32 0.05 160);
   --pastel-green-foreground: oklch(0.85 0.09 160);
-  --pastel-red: oklch(0.32 0.06 25);
-  --pastel-red-foreground: oklch(0.83 0.09 25);
   --pastel-blue: oklch(0.32 0.05 250);
   --pastel-blue-foreground: oklch(0.85 0.07 250);
   --pastel-purple: oklch(0.32 0.06 295);

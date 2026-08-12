@@ -34,11 +34,11 @@ export function CalendarWidget() {
 
   return (
     <div className="bg-card p-4 sm:p-5 rounded-2xl border border-border shadow-xs relative overflow-hidden">
-      <div className="flex justify-between items-center mb-4 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
-        <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100"><span>📅</span> {t.months[month]} {year}</div>
+      <div className="flex justify-between items-center mb-4 bg-secondary/50 p-2 rounded-xl border border-border">
+        <div className="flex items-center gap-2 text-xs font-bold text-foreground"><span>📅</span> {t.months[month]} {year}</div>
         <div className="flex gap-1">
-          <button type="button" onClick={() => changeMonth(-1)} className="w-7 h-7 flex items-center justify-center bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-xs font-bold shadow-2xs hover:bg-slate-100 dark:hover:bg-slate-600 cursor-pointer" title={t.calendarPrevMonth}>&lt;</button>
-          <button type="button" onClick={() => changeMonth(1)} className="w-7 h-7 flex items-center justify-center bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-xs font-bold shadow-2xs hover:bg-slate-100 dark:hover:bg-slate-600 cursor-pointer" title={t.calendarNextMonth}>&gt;</button>
+          <button type="button" onClick={() => changeMonth(-1)} className="w-7 h-7 flex items-center justify-center bg-card border border-border rounded-lg text-xs font-bold shadow-2xs hover:bg-secondary cursor-pointer">&lt;</button>
+          <button type="button" onClick={() => changeMonth(1)} className="w-7 h-7 flex items-center justify-center bg-card border border-border rounded-lg text-xs font-bold shadow-2xs hover:bg-secondary cursor-pointer">&gt;</button>
         </div>
       </div>
 
@@ -53,19 +53,34 @@ export function CalendarWidget() {
         {monthDaysArray.map((day) => {
           const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
           const holiday = MOROCCO_HOLIDAYS_2026[dateStr], isPast = dateStr < todayStr
-          let style = 'hover:bg-primary/10 text-foreground font-medium border border-transparent', tooltip = t.calendarTooltipWorkday
-          if (holiday) {
-            style = holiday.type === 'religious' ? 'bg-amber-500/30 text-amber-950 dark:text-amber-100 font-extrabold border-2 border-amber-500 shadow-xs scale-105' : 'bg-rose-500/30 text-rose-950 dark:text-rose-100 font-extrabold border-2 border-rose-500 shadow-xs scale-105'
+          const isToday = dateStr === todayStr
+
+          let cellStyle = 'hover:bg-secondary text-foreground font-medium border border-transparent'
+          let tooltip = t.calendarTooltipWorkday
+
+          if (isToday) {
+            cellStyle = 'border-2 border-[#d6492a] font-bold text-[#d6492a] bg-[#d6492a]/10 shadow-2xs'
+            tooltip = t.calendarTooltipToday
+          } else if (holiday) {
+            cellStyle = 'hover:bg-secondary font-semibold text-foreground'
             tooltip = `${holiday.type === 'religious' ? t.calendarTooltipReligious : t.calendarTooltipLegal} ${getHolidayName(dateStr, holiday.name)}`
-          } else if (dateStr === todayStr) { style = 'ring-2 ring-primary bg-primary/20 font-bold text-primary shadow-xs'; tooltip = t.calendarTooltipToday }
-          else if (isPast) { style = 'bg-secondary/60 text-muted-foreground/70 font-normal hover:bg-secondary'; tooltip = `${t.calendarTooltipPast} (${dateStr})` }
-          else if (month === 6 || month === 7) { style = 'bg-secondary text-muted-foreground/50 line-through'; tooltip = t.calendarTooltipSummer }
+          } else if (isPast) {
+            cellStyle = 'bg-secondary/40 text-muted-foreground/60 font-normal hover:bg-secondary'
+            tooltip = `${t.calendarTooltipPast} (${dateStr})`
+          } else if (month === 6 || month === 7) {
+            cellStyle = 'bg-secondary/30 text-muted-foreground/40 line-through'
+            tooltip = t.calendarTooltipSummer
+          }
 
           return (
-            <div key={day} title={tooltip} onClick={() => setSelectedDayDetails({ dateStr, dayNum: day })} className={`h-8 w-8 relative flex flex-col items-center justify-center rounded-lg text-xs cursor-pointer mx-auto transition-all ${style}`}>
+            <div key={day} title={tooltip} onClick={() => setSelectedDayDetails({ dateStr, dayNum: day })} className={`h-8 w-8 relative flex flex-col items-center justify-center rounded-lg text-xs cursor-pointer mx-auto transition-all ${cellStyle}`}>
               <span>{day}</span>
-              {holiday && <span className="text-[7px] font-bold uppercase tracking-tight -mt-0.5">{holiday.type === 'religious' ? t.calendarHolidayAid : t.calendarHolidayLegal}</span>}
-              {isPast && !holiday && <span className="absolute -top-0.5 -right-0.5 text-[9px] font-extrabold text-emerald-600 dark:text-emerald-400">✓</span>}
+              {holiday && (
+                <span className={`size-1.5 rounded-full -mt-0.5 ${holiday.type === 'religious' ? 'bg-[#d6492a]' : 'bg-[#1e1b4b] dark:bg-slate-300'}`} />
+              )}
+              {isPast && !holiday && (
+                <span className="absolute -top-0.5 -right-0.5 text-[9px] font-extrabold text-emerald-600 dark:text-emerald-400">✓</span>
+              )}
             </div>
           )
         })}
@@ -73,15 +88,15 @@ export function CalendarWidget() {
 
       <div className="mt-4 pt-3 border-t border-border space-y-2">
         <div className="flex items-center justify-between text-xs font-bold text-foreground">
-          <span className="flex items-center gap-1.5"><Sparkles className="size-3.5 text-primary" /> {t.calendarEventsOf} {t.months[month]} {year} :</span>
+          <span className="flex items-center gap-1.5"><Sparkles className="size-3.5 text-[#d6492a]" /> {t.calendarEventsOf} {t.months[month]} {year} :</span>
           <span className="text-[10px] font-semibold text-muted-foreground">{currentMonthHolidays.length} {t.calendarNeutralizedDays}</span>
         </div>
         {currentMonthHolidays.length > 0 ? (
           <div className="space-y-1.5">
             {currentMonthHolidays.map(([dStr, h], idx) => (
-              <div key={idx} onClick={() => setSelectedDayDetails({ dateStr: dStr, dayNum: Number(dStr.split('-')[2]) })} className={`flex items-center justify-between p-2 rounded-lg text-xs font-semibold cursor-pointer border transition-all hover:scale-[1.01] ${h.type === 'religious' ? 'bg-amber-500/10 text-amber-800 dark:text-amber-200 border-amber-500/30' : 'bg-rose-500/10 text-rose-800 dark:text-rose-200 border-rose-500/30'}`}>
+              <div key={idx} onClick={() => setSelectedDayDetails({ dateStr: dStr, dayNum: Number(dStr.split('-')[2]) })} className={`flex items-center justify-between p-2 rounded-lg text-xs font-semibold cursor-pointer border bg-card hover:bg-secondary transition-all ${h.type === 'religious' ? 'border-l-4 border-l-[#d6492a] border-border' : 'border-l-4 border-l-[#1e1b4b] border-border'}`}>
                 <div className="flex items-center gap-2"><span>{h.type === 'religious' ? '🌙' : '🇲🇦'}</span><span>{getHolidayName(dStr, h.name)}</span></div>
-                <span className="font-mono text-[10px] opacity-80">{dStr}</span>
+                <span className="font-mono text-[10px] text-muted-foreground">{dStr}</span>
               </div>
             ))}
           </div>

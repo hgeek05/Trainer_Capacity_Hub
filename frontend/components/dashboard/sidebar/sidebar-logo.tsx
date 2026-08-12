@@ -17,7 +17,6 @@ export function SidebarLogo() {
       </div>
       <div className="leading-tight px-1 pt-1">
         <p className="text-[11px] font-bold text-sidebar-accent-foreground tracking-tight">Trainer Capacity Hub</p>
-        <p className="text-[10px] text-sidebar-foreground/80 font-medium">Super Admin Cockpit</p>
       </div>
     </div>
   )

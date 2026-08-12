@@ -59,11 +59,11 @@ export function ManagerChatbot() {
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="group flex items-center gap-2 rounded-full bg-purple-600 px-4 py-3.5 text-xs font-bold text-white shadow-xl transition-all duration-200 hover:bg-purple-700 hover:scale-105 cursor-pointer"
+          className="group flex items-center gap-2 rounded-full bg-[#5b0dbc] hover:bg-[#4a0a9c] px-4 py-3.5 text-xs font-bold text-white shadow-xl transition-all duration-200 hover:scale-105 cursor-pointer border border-white/20"
           title={t.botName}
         >
           <Sparkles className="size-4 animate-pulse text-amber-300" />
-          <span className="font-semibold">{t.botName}</span>
+          <span className="font-bold">{t.botName}</span>
           <span className="flex size-2 rounded-full bg-emerald-400 animate-ping" />
         </button>
       ) : (

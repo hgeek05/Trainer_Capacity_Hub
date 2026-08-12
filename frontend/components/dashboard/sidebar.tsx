@@ -1,12 +1,22 @@
 'use client'
 
-import { Activity, Calendar, LayoutDashboard, Settings, Users } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import { Calendar, LayoutDashboard, Settings, Users } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 import { SidebarLogo } from '@/components/dashboard/sidebar/sidebar-logo'
 import { SidebarCenters } from '@/components/dashboard/sidebar/sidebar-centers'
 
-export type TabType = 'dashboard' | 'trainers' | 'planning' | 'activities' | 'settings'
+/** Les 4 accès du cockpit. `activities` a été fusionné dans `planning` (calendrier & jours neutralisés). */
+export type TabType = 'dashboard' | 'trainers' | 'planning' | 'settings'
+
+interface MainNavItem {
+  id: TabType
+  label: string
+  /** Sous-titre métier affiché sous le libellé de l'onglet. */
+  hint: string
+  icon: LucideIcon
+}
 
 interface SidebarProps {
   activeTab?: TabType
@@ -23,12 +33,11 @@ export function Sidebar({
 }: SidebarProps) {
   const { t } = useLanguage()
 
-  const mainItems: { id: TabType; label: string; icon: any }[] = [
-    { id: 'dashboard', label: t.dashboard || 'Dashboard Global', icon: LayoutDashboard },
-    { id: 'trainers', label: t.trainers || 'Formateurs', icon: Users },
-    { id: 'planning', label: t.planning || 'Planning & Sessions', icon: Calendar },
-    { id: 'activities', label: t.activities || 'Activités & Charges', icon: Activity },
-    { id: 'settings', label: t.settings || 'Réglages System', icon: Settings },
+  const mainItems: MainNavItem[] = [
+    { id: 'dashboard', label: t.dashboard, hint: t.tabHintDashboard, icon: LayoutDashboard },
+    { id: 'trainers', label: t.trainers, hint: t.tabHintTrainers, icon: Users },
+    { id: 'planning', label: t.planning, hint: t.tabHintPlanning, icon: Calendar },
+    { id: 'settings', label: t.settings, hint: t.tabHintSettings, icon: Settings },
   ]
 
   return (
@@ -49,15 +58,26 @@ export function Sidebar({
                   <button
                     type="button"
                     onClick={() => onSelectTab && onSelectTab(item.id)}
+                    aria-current={isActive ? 'page' : undefined}
                     className={cn(
-                      'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium transition-colors cursor-pointer',
+                      'flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-medium transition-colors cursor-pointer',
                       isActive
                         ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground shadow-sm dark:bg-sidebar-primary dark:text-sidebar-primary-foreground'
                         : 'text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground dark:hover:bg-sidebar-accent dark:hover:text-sidebar-accent-foreground',
                     )}
                   >
-                    <Icon className="size-4 shrink-0" />
-                    <span className="truncate">{item.label}</span>
+                    <Icon className="mt-0.5 size-4 shrink-0" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate">{item.label}</span>
+                      <span
+                        className={cn(
+                          'mt-0.5 block truncate text-[10px] font-normal',
+                          isActive ? 'opacity-70' : 'opacity-60',
+                        )}
+                      >
+                        {item.hint}
+                      </span>
+                    </span>
                   </button>
                 </li>
               )

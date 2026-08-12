@@ -1,8 +1,8 @@
 'use client'
 
 import { Search } from 'lucide-react'
+import { AvailabilityMatrixFilter } from '@/components/dashboard/trainer-table/availability-matrix-filter'
 import { useLanguage } from '@/lib/i18n'
-import { cn } from '@/lib/utils'
 
 interface TableFiltersProps {
   selectedCenter: string
@@ -32,11 +32,11 @@ export function TableFilters({
       <div className="flex flex-wrap items-center gap-3">
         {/* Filtre par Centre */}
         <div>
-          <label className="block text-xs font-medium text-muted-foreground mb-1">{t.center}</label>
+          <label className="block text-xs font-semibold text-muted-foreground mb-1">{t.center}</label>
           <select
             value={selectedCenter}
             onChange={(e) => onSelectCenter(e.target.value)}
-            className="h-8 rounded-lg border border-border bg-card px-3 py-1 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
+            className="h-8 rounded-lg border border-border bg-card px-3 py-1 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-[#d6492a]/20 cursor-pointer font-semibold"
           >
             <option value="ALL">{t.allCenters}</option>
             <option value="Ben Guerir">Ben Guerir</option>
@@ -46,68 +46,20 @@ export function TableFilters({
           </select>
         </div>
 
-        {/* Matrice de Disponibilité (Filtres Rapides) */}
-        <div>
-          <label className="block text-xs font-medium text-muted-foreground mb-1">{t.availabilityMatrix}</label>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => onSelectStatusFilter('ALL')}
-              className={cn(
-                'px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer',
-                statusFilter === 'ALL'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-card border border-border text-muted-foreground hover:bg-secondary',
-              )}
-            >
-              {t.all}
-            </button>
-            <button
-              type="button"
-              onClick={() => onSelectStatusFilter('AVAILABLE')}
-              className={cn(
-                'px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer',
-                statusFilter === 'AVAILABLE'
-                  ? 'bg-emerald-500 text-white'
-                  : 'bg-card border border-border text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10',
-              )}
-            >
-              🟢 {t.available}
-            </button>
-            <button
-              type="button"
-              onClick={() => onSelectStatusFilter('WATCH')}
-              className={cn(
-                'px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer',
-                statusFilter === 'WATCH'
-                  ? 'bg-amber-500 text-white'
-                  : 'bg-card border border-border text-amber-600 dark:text-amber-400 hover:bg-amber-500/10',
-              )}
-            >
-              🟡 {t.watch}
-            </button>
-            <button
-              type="button"
-              onClick={() => onSelectStatusFilter('CRITICAL')}
-              className={cn(
-                'px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer',
-                statusFilter === 'CRITICAL'
-                  ? 'bg-rose-500 text-white'
-                  : 'bg-card border border-border text-rose-600 dark:text-rose-400 hover:bg-rose-500/10',
-              )}
-            >
-              🔴 {t.critical}
-            </button>
-          </div>
-        </div>
+        {/* Matrice de Disponibilité */}
+        <AvailabilityMatrixFilter
+          statusFilter={statusFilter}
+          onSelectStatusFilter={onSelectStatusFilter}
+          t={t}
+        />
 
         {/* Filtre par Période */}
         <div>
-          <label className="block text-xs font-medium text-muted-foreground mb-1">{t.period}</label>
+          <label className="block text-xs font-semibold text-muted-foreground mb-1">{t.period}</label>
           <select
             value={selectedPeriod}
             onChange={(e) => onSelectPeriod(e.target.value)}
-            className="h-8 rounded-lg border border-border bg-card px-3 py-1 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
+            className="h-8 rounded-lg border border-border bg-card px-3 py-1 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-[#d6492a]/20 cursor-pointer font-semibold"
           >
             <option value="ANNEE_2026">{t.periodAll2026}</option>
             <option value="S1">{t.periodS1}</option>
@@ -117,16 +69,16 @@ export function TableFilters({
         </div>
       </div>
 
-      {/* Recherche textuelle par nom ou email */}
-      <div className="w-full sm:w-64">
-        <label className="block text-xs font-medium text-muted-foreground mb-1">{t.searchTrainer}</label>
+      {/* Recherche textuelle élargie */}
+      <div className="w-full sm:w-72 md:w-80">
+        <label className="block text-xs font-semibold text-muted-foreground mb-1">{t.searchTrainer}</label>
         <div className="relative flex items-center">
           <input
             type="text"
             placeholder={t.searchPlaceholderName}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full h-8 rounded-lg border border-border bg-card px-3 py-1 pr-8 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full h-8 rounded-lg border border-border bg-card px-3 py-1 pr-8 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#d6492a]/20 font-medium"
           />
           <Search className="absolute right-2.5 size-3.5 text-muted-foreground pointer-events-none" />
         </div>

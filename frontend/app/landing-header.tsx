@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-
 interface LandingHeaderProps {
   lang: 'FR' | 'EN'
   setLang: (lang: 'FR' | 'EN') => void

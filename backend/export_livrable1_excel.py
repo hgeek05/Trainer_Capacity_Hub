@@ -5,16 +5,13 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
 
-
 ROOT = Path(r"C:\Users\hp\Documents\Trainer_Capacity_Hub")
 SCRIPT_PATH = ROOT / "backend" / "livrable1.py"
 OUT_PATH = ROOT / "backend" / "livrable1_export.xlsx"
 
-
 spec = importlib.util.spec_from_file_location("livrable1_module", SCRIPT_PATH)
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
-
 
 wb = Workbook()
 ws = wb.active

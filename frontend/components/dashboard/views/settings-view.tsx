@@ -6,18 +6,16 @@ import {
   TECHNIX_SITES,
   TRAINING_DOMAINS,
 } from '@/components/dashboard/planning/planning-reference'
-
 export function SettingsView() {
   const { t } = useLanguage()
-
   return (
-    <div className="flex flex-col gap-6 rounded-2xl border border-border bg-card p-6 shadow-xs animate-in fade-in duration-200">
-      <div className="border-b border-border pb-4">
-        <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-          <Sliders className="size-5 text-primary" />
+    <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-xs animate-in fade-in duration-200">
+      <div className="border-b border-border pb-3">
+        <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+          <Sliders className="size-4 text-primary" />
           {t.settings}
         </h2>
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="text-xs text-muted-foreground mt-0.5">
           Configuration des seuils d'audit intelligent, gestion des 4 centres et paramètres de calcul.
         </p>
       </div>

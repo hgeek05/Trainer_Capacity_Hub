@@ -12,16 +12,16 @@ export function TrainersGrid({ trainers }: TrainersGridProps) {
   const { t } = useLanguage()
 
   return (
-    <div className="overflow-x-auto">
+    <div className="max-h-[500px] overflow-y-auto overflow-x-auto">
       <table className="w-full text-left">
-        <thead>
-          <tr className="border-b border-border text-xs font-semibold text-muted-foreground">
-            <th scope="col" className="px-5 py-3 font-medium">{t.trainer}</th>
-            <th scope="col" className="px-4 py-3 font-medium">{t.centerAndRole}</th>
-            <th scope="col" className="px-4 py-3 font-medium">{t.global}</th>
-            <th scope="col" className="px-4 py-3 font-medium">{t.animation}</th>
-            <th scope="col" className="px-4 py-3 font-medium">{t.rate}</th>
-            <th scope="col" className="px-5 py-3 font-medium">{t.status}</th>
+        <thead className="sticky top-0 bg-card z-10 border-b border-border shadow-xs">
+          <tr className="text-xs font-semibold text-muted-foreground">
+            <th scope="col" className="px-4 py-2.5 font-medium">{t.trainer}</th>
+            <th scope="col" className="px-3 py-2.5 font-medium">{t.centerAndRole}</th>
+            <th scope="col" className="px-3 py-2.5 font-medium">{t.global}</th>
+            <th scope="col" className="px-3 py-2.5 font-medium">{t.animation}</th>
+            <th scope="col" className="px-3 py-2.5 font-medium">{t.rate}</th>
+            <th scope="col" className="px-4 py-2.5 font-medium">{t.status}</th>
           </tr>
         </thead>
         <tbody>

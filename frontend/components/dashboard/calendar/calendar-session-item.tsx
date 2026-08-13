@@ -26,11 +26,11 @@ export function CalendarSessionItem({ session, confirmedLabel }: CalendarSession
       </div>
       <p className="text-muted-foreground text-[11px]">{session.courseTitle}</p>
       <div className="flex items-center gap-2 text-[10px] text-muted-foreground pt-1">
-        <span className="flex items-center gap-1">
-          <MapPin className="size-3 text-rose-500" /> {session.center}
+        <span className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
+          <MapPin className="size-3 text-slate-400" /> {session.center}
         </span>
-        <span className="flex items-center gap-1">
-          <Clock className="size-3 text-amber-500" /> {confirmedLabel}
+        <span className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
+          <Clock className="size-3 text-slate-400" /> {confirmedLabel}
         </span>
       </div>
     </div>

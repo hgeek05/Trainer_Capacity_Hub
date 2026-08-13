@@ -35,30 +35,30 @@ function EventsPanel() {
   ]
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-5">
-      <div className="mb-4 flex items-center gap-2">
-        <CalendarDays className="size-4 text-[#d6492a]" />
-        <h2 className="text-base font-extrabold tracking-tight text-foreground">
+    <section className="rounded-xl border border-border bg-card p-3.5">
+      <div className="mb-3 flex items-center gap-1.5">
+        <CalendarDays className="size-3.5 text-[#d6492a]" />
+        <h2 className="text-xs font-extrabold tracking-tight text-foreground">
           {t.upcomingEvents || 'Événements & Neutralisations'}
         </h2>
       </div>
-      <ul className="flex flex-col gap-3">
+      <ul className="flex flex-col gap-2">
         {events.map((event) => (
           <li
             key={event.title}
-            className={`rounded-xl border border-border bg-card p-4 transition-all hover:bg-secondary/40 ${event.borderClass}`}
+            className={`rounded-lg border border-border bg-card p-2.5 transition-all hover:bg-secondary/40 ${event.borderClass}`}
           >
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-xs font-bold text-foreground">{event.title}</p>
-                <p className="mt-0.5 text-[11px] text-muted-foreground leading-relaxed">{event.description}</p>
+                <p className="text-[11px] font-bold text-foreground truncate">{event.title}</p>
+                <p className="mt-0.5 text-[10px] text-muted-foreground leading-snug line-clamp-1">{event.description}</p>
               </div>
-              <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold whitespace-nowrap shadow-2xs ${event.badgeClass}`}>
+              <span className={`shrink-0 rounded-full px-2 py-0.5 text-[9px] font-bold whitespace-nowrap ${event.badgeClass}`}>
                 {event.remaining}
               </span>
             </div>
-            <div className="mt-2.5 flex items-center gap-1.5 text-[11px] text-muted-foreground font-semibold">
-              <Lock className="size-3 text-[#d6492a]" aria-hidden="true" />
+            <div className="mt-1.5 flex items-center gap-1 text-[10px] text-muted-foreground font-medium">
+              <Lock className="size-2.5 text-[#d6492a]" aria-hidden="true" />
               {event.dates}
             </div>
           </li>
@@ -70,7 +70,7 @@ function EventsPanel() {
 
 export function RightPanel() {
   return (
-    <div className="flex w-full shrink-0 flex-col gap-4 xl:w-80">
+    <div className="flex w-full flex-col gap-3">
       <CalendarWidget />
       <EventsPanel />
     </div>

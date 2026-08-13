@@ -62,14 +62,12 @@ class TrainerCreate(BaseModel):
     center_id: Optional[int] = Field(1, ge=1)
     domain: Optional[str] = Field("Digital", max_length=50)
 
-
 class CapacitySummaryResponse(BaseModel):
     capacite_globale_nette: int
     jours_favorables_animation: int
     cible_animation: int
     fenetres_bloquees: int
     hors_animation_cible: int
-
 
 class TrainerDashboardItem(BaseModel):
     formateur_id: str

@@ -10,23 +10,23 @@ export function TrainersView() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
 
   return (
-    <div className="flex flex-col gap-6 rounded-2xl border border-border bg-card p-6 shadow-xs animate-in fade-in duration-200">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+    <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-xs animate-in fade-in duration-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
         <div>
-          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-            <Users className="size-5 text-[#d6492a]" />
+          <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <Users className="size-4 text-primary" />
             {t.trainersViewTitle}
           </h2>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-muted-foreground mt-0.5">
             {t.trainersViewSubtitle}
           </p>
         </div>
         <button
           type="button"
           onClick={() => setIsAddModalOpen(true)}
-          className="inline-flex items-center gap-2 rounded-xl bg-[#d6492a] hover:bg-[#c23e20] px-4 py-2 text-xs font-bold text-white shadow-md transition-all cursor-pointer"
+          className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-[#d6492a] hover:bg-[#c23e20] px-3 text-xs font-medium text-white transition-all cursor-pointer shadow-xs"
         >
-          <UserPlus className="size-4" />
+          <UserPlus className="size-3.5" />
           {t.newTrainer}
         </button>
       </div>

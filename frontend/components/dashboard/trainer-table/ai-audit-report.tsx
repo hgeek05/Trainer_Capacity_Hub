@@ -93,11 +93,8 @@ export function AiAuditReport({ anomalies, onClose }: AiAuditReportProps) {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center pt-2 border-t border-border/60 text-[11px] text-muted-foreground font-mono">
+              <div className="flex items-center justify-between pt-2 border-t border-border/60 text-[11px] text-muted-foreground font-mono">
                 <span>{t.aiStatus} {anomaly.level}</span>
-                <span className="text-sidebar-primary font-medium cursor-pointer hover:underline">
-                  {t.checkFile}
-                </span>
               </div>
             </div>
           )

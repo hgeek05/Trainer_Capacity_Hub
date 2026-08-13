@@ -35,14 +35,14 @@ function DashboardContent() {
   }, [tabParam])
 
   return (
-    <div className="flex min-h-svh bg-background">
+    <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground text-xs antialiased">
       <Sidebar
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         selectedCenter={selectedCenter}
         onSelectCenter={setSelectedCenter}
       />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <TopBar
           period={selectedTimeframe}
           onSelectPeriod={setSelectedTimeframe}
@@ -50,10 +50,10 @@ function DashboardContent() {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
         />
-        <main className="flex flex-1 flex-col gap-4 p-6 xl:flex-row">
-          <div className="flex min-w-0 flex-1 flex-col gap-4">
-            {activeTab === 'dashboard' && (
-              <>
+        <main className="flex-1 overflow-y-auto p-3.5 md:p-5 space-y-4">
+          {activeTab === 'dashboard' ? (
+            <div className="grid grid-cols-12 gap-4">
+              <div className="col-span-12 xl:col-span-9 flex min-w-0 flex-col gap-4">
                 <KpiCards timeframe={selectedTimeframe} />
                 <div id="trainer-table-section">
                   <TrainerTable
@@ -63,19 +63,24 @@ function DashboardContent() {
                     onSearchChange={setSearchQuery}
                   />
                 </div>
-              </>
-            )}
-            {activeTab === 'trainers' && <TrainersView />}
-            {/* Planning & Sessions regroupe les affectations puis le calendrier officiel. */}
-            {activeTab === 'planning' && (
-              <>
-                <PlanningView />
-                <ActivitiesView />
-              </>
-            )}
-            {activeTab === 'settings' && <SettingsView />}
-          </div>
-          <RightPanel />
+              </div>
+              <div className="col-span-12 xl:col-span-3">
+                <RightPanel />
+              </div>
+            </div>
+          ) : (
+            <div className="flex min-w-0 flex-col gap-4 w-full">
+              {activeTab === 'trainers' && <TrainersView />}
+              {/* Planning & Sessions regroupe les affectations puis le calendrier officiel. */}
+              {activeTab === 'planning' && (
+                <>
+                  <PlanningView />
+                  <ActivitiesView />
+                </>
+              )}
+              {activeTab === 'settings' && <SettingsView />}
+            </div>
+          )}
         </main>
       </div>
 

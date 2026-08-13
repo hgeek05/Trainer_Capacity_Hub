@@ -16,7 +16,7 @@ class Center(Base):
     profiles = relationship("Profile", back_populates="center")
     activities = relationship("Activity", back_populates="center")
 
-class Specialty(Base): 
+class Specialty(Base):
     __tablename__ = "specialties"
     id = Column(Integer, primary_key=True, index=True)
     nom_specialite = Column(String, unique=True, index=True)
@@ -48,7 +48,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     password_hash = Column(String)
     role_id = Column(Integer, ForeignKey("roles.id"))
-    is_active = Column(Boolean, default=True)    
+    is_active = Column(Boolean, default=True)
     role = relationship("Role", back_populates="users")
     profile = relationship("Profile", back_populates="user", uselist=False, foreign_keys="[Profile.user_id]")
     weekly_declarations = relationship("WeeklyDeclaration", back_populates="user")
@@ -123,7 +123,7 @@ class UnavailabilityPeriod(Base):
     unavailability_type = Column(String)
     start_date = Column(Date)
     end_date = Column(Date)
-    coefficient = Column(Float)    
+    coefficient = Column(Float)
     user = relationship("User", back_populates="unavailability_periods")
 
 class CalendarExclusion(Base):
@@ -133,7 +133,6 @@ class CalendarExclusion(Base):
     start_date = Column(Date)
     end_date = Column(Date)
     coefficient = Column(Float)
-
 
 class WeekCoefficient(Base):
     __tablename__ = "week_coefficients"
@@ -150,7 +149,7 @@ class CapacityTarget(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     year = Column(Integer)
     target_capacity_days = Column(Float)
-    available_capacity_days = Column(Float)    
+    available_capacity_days = Column(Float)
     user = relationship("User", back_populates="capacity_targets")
 
 class Leave(Base):
@@ -162,5 +161,3 @@ class Leave(Base):
     end_date = Column(Date)
     status = Column(String)
     user = relationship("User", back_populates="leaves")
-
-

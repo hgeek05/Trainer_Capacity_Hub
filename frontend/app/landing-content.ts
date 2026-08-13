@@ -15,10 +15,10 @@ export const landingContent: Record<'FR' | 'EN', LandingContent> = {
     subtitle:
       'Système de pilotage exécutif et d’optimisation de la capacité d’animation des formateurs à travers le réseau des centres UM6P.',
     managerTitle: 'Espace Direction & Management',
-    managerDesc: 'Cockpit exécutif, suivi de capacité globale & indicateurs stratégiques de charge.',
+    managerDesc: 'Suivi de capacité globale & indicateurs stratégiques de charge.',
     managerCta: "Accéder à l'Espace Direction",
     plannerTitle: 'Espace Planification',
-    plannerDesc: 'Planning annuel, affectations hebdomadaires & gestion des fenêtres de formation.',
+    plannerDesc: 'Planning annuel & gestion des fenêtres de formation.',
     plannerCta: 'Accéder au Planning',
     sitesHeader: 'NOS CENTRES DE FORMATION',
     sites: [
@@ -32,10 +32,10 @@ export const landingContent: Record<'FR' | 'EN', LandingContent> = {
     subtitle:
       'Executive dashboard and trainer capacity optimization system across UM6P training centers network.',
     managerTitle: 'Management & Steering Space',
-    managerDesc: 'Executive cockpit, capacity monitoring & strategic performance metrics.',
+    managerDesc: 'Capacity monitoring & strategic performance metrics.',
     managerCta: 'Access Direction Space',
     plannerTitle: 'Planning Space',
-    plannerDesc: 'Annual schedule, weekly assignments & training window management.',
+    plannerDesc: 'Annual schedule & training window management.',
     plannerCta: 'Access Planning',
     sitesHeader: 'OUR TRAINING CENTERS',
     sites: [

@@ -32,20 +32,9 @@ export function ActionBar({
   const { t } = useLanguage()
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
-      <div className="flex items-center gap-3">
-        <h2 className="text-base font-extrabold tracking-tight text-foreground">{t.trainerLoad}</h2>
-        <span
-          className={cn(
-            'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold',
-            isLive
-              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
-              : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20',
-          )}
-        >
-          <span className={cn('size-1.5 rounded-full', isLive ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500')} />
-          {isLive ? t.apiDirect : t.demoMode}
-        </span>
+    <div className="flex flex-nowrap items-center justify-between gap-3 px-4 py-2.5 overflow-x-auto no-scrollbar">
+      <div className="flex shrink-0 items-center gap-3">
+        <h2 className="text-sm font-extrabold tracking-tight text-foreground whitespace-nowrap">{t.trainerLoad}</h2>
       </div>
 
       <ActionBarButtons

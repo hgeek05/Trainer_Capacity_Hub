@@ -9,10 +9,8 @@ import models
 from services.capacity_calculator import get_capacity_summary
 from services.rules_engine import check_animation_alert, get_current_week_type, get_week_status_label
 
-
 def _format_days(value: float, total: int) -> str:
     return f"{int(round(value))}/{int(total)} j"
-
 
 def _inclusive_days(start_date: date | None, end_date: date | None) -> float:
     if start_date is None or end_date is None:
@@ -20,7 +18,6 @@ def _inclusive_days(start_date: date | None, end_date: date | None) -> float:
     if end_date < start_date:
         return 0.0
     return float((end_date - start_date).days + 1)
-
 
 def get_trainer_dashboard_items(db: Session) -> list[dict]:
     summary = get_capacity_summary()

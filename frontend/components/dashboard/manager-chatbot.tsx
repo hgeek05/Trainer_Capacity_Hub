@@ -5,7 +5,6 @@ import { Sparkles } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n'
 import { getBotResponse } from '@/components/dashboard/chatbot/chatbot-rules'
 import { ChatbotWindow, type Message } from '@/components/dashboard/chatbot/chatbot-window'
-
 export function ManagerChatbot() {
   const { t, lang } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
@@ -36,7 +35,6 @@ export function ManagerChatbot() {
 
     const userText = input.trim()
     const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-
     const userMsg: Message = { id: Date.now(), sender: 'user', text: userText, timestamp: now }
     setMessages((prev) => [...prev, userMsg])
     setInput('')
@@ -59,12 +57,12 @@ export function ManagerChatbot() {
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="group flex items-center gap-2 rounded-full bg-[#5b0dbc] hover:bg-[#4a0a9c] px-4 py-3.5 text-xs font-bold text-white shadow-xl transition-all duration-200 hover:scale-105 cursor-pointer border border-white/20"
+          className="relative flex size-11 items-center justify-center rounded-full bg-[#5b0dbc] hover:bg-[#4a0a9c] text-white shadow-xl transition-all duration-200 hover:scale-105 cursor-pointer border border-white/20"
           title={t.botName}
         >
-          <Sparkles className="size-4 animate-pulse text-amber-300" />
-          <span className="font-bold">{t.botName}</span>
-          <span className="flex size-2 rounded-full bg-emerald-400 animate-ping" />
+          <Sparkles className="size-5 text-amber-300 animate-pulse" />
+          <span className="absolute -top-0.5 -right-0.5 flex size-2.5 rounded-full bg-emerald-400 animate-ping" />
+          <span className="absolute -top-0.5 -right-0.5 flex size-2.5 rounded-full bg-emerald-500" />
         </button>
       ) : (
         <ChatbotWindow

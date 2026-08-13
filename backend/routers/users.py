@@ -4,9 +4,7 @@ from database import get_db
 import models
 import schemas
 
-
 router = APIRouter(prefix="/users", tags=["Users"])
-
 
 def _serialize_user(user: models.User) -> dict:
     profile = user.profile
@@ -25,7 +23,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    
+
     formateur_role = db.query(models.Role).filter(models.Role.nom_role == "Formateur").first()
     if formateur_role is None:
         formateur_role = models.Role(nom_role="Formateur")
@@ -52,7 +50,6 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.add(new_profile)
     db.commit()
     db.refresh(new_user)
-    
     return _serialize_user(new_user)
 
 @router.get("/", response_model=list[schemas.UserResponse])

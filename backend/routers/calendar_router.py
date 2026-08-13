@@ -5,7 +5,6 @@ import holidays
 
 router = APIRouter(prefix="/calendar", tags=["Calendar & Holidays"])
 
-
 @router.get("/auto-holidays")
 def get_auto_morocco_holidays(year: int = 2026):
     """

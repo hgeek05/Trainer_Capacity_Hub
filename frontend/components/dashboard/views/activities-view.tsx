@@ -23,7 +23,6 @@ export function ActivitiesView() {
     const csvRows = (holidaysList || [])
       .map((h) => `"${h.name}","${h.date}","Jour Férié / Fête Religieuse Maroc","${h.status || 'Neutralisé'}"`)
       .join('\n')
-
     const blob = new Blob([csvHeader + csvRows], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -35,46 +34,46 @@ export function ActivitiesView() {
   }
 
   return (
-    <div className="flex flex-col gap-6 rounded-2xl border border-border bg-card p-6 shadow-xs animate-in fade-in duration-200">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+    <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-xs animate-in fade-in duration-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
         <div>
-          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-            <Activity className="size-5 text-primary" />
+          <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <Activity className="size-4 text-primary" />
             {t.activitiesViewTitle}
           </h2>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-muted-foreground mt-0.5">
             {t.activitiesViewSubtitle}
           </p>
         </div>
         <button
           type="button"
           onClick={handleExport}
-          className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 transition-all cursor-pointer shadow-xs"
+          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 text-xs font-medium text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 transition-all cursor-pointer shadow-xs"
         >
-          <FileSpreadsheet className="size-4" />
+          <FileSpreadsheet className="size-3.5" />
           {t.exportPlanning}
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-5 rounded-xl border border-border bg-card">
-          <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="p-4 rounded-xl border border-border bg-card">
+          <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
             <CheckCircle className="size-4 text-emerald-500" />
             {t.favorableDaysCount}
           </h3>
-          <p className="text-3xl font-bold text-foreground">178 {t.daysCount}</p>
-          <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+          <p className="text-2xl font-bold text-foreground">178 {t.daysCount}</p>
+          <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
             {t.favorableDaysDesc}
           </p>
         </div>
 
-        <div className="p-5 rounded-xl border border-border bg-card">
-          <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+        <div className="p-4 rounded-xl border border-border bg-card">
+          <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
             <Building2 className="size-4 text-primary" />
             {t.optimalTargetTitle}
           </h3>
-          <p className="text-3xl font-bold text-primary">107 {t.daysPerYearUnit}</p>
-          <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+          <p className="text-2xl font-bold text-primary">107 {t.daysPerYearUnit}</p>
+          <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
             {t.optimalTargetDesc}
           </p>
         </div>

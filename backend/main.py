@@ -42,7 +42,7 @@ async def add_security_headers(request: Request, call_next):
     # Sur /docs, /redoc et /openapi.json, ne pas appliquer de restriction CSP pour laisser Swagger UI s'exécuter
     if not request.url.path.startswith(("/docs", "/redoc", "/openapi.json")):
         response.headers["Content-Security-Policy"] = "default-src 'self'; frame-ancestors 'none';"
-        
+
     return response
 
 # Handler global pour masquer les erreurs 500 internes et éviter le leak de stack traces

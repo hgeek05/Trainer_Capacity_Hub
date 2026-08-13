@@ -1,7 +1,7 @@
 """Initialisation des 15 tables du MCD
 
 Revision ID: a4604349ea11
-Revises: 
+Revises:
 Create Date: 2026-07-29 11:21:21.072077
 
 """
@@ -10,13 +10,11 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
-
 # revision identifiers, used by Alembic.
 revision: str = 'a4604349ea11'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
-
 
 def upgrade() -> None:
     """Upgrade schema."""
@@ -181,7 +179,6 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_validation_history_id'), 'validation_history', ['id'], unique=False)
     # ### end Alembic commands ###
-
 
 def downgrade() -> None:
     """Downgrade schema."""

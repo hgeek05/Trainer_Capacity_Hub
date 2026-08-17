@@ -70,7 +70,7 @@ export function TrainerTable({
 
       <AiAuditReport anomalies={table.aiAnomalies} onClose={() => table.setAiAnomalies([])} />
 
-      <TrainersGrid trainers={table.filteredTrainers} />
+      <TrainersGrid trainers={table.filteredTrainers} onDeleteTrainer={table.handleDeleteTrainer} />
 
       <AddTrainerModal
         isOpen={table.isAddModalOpen}

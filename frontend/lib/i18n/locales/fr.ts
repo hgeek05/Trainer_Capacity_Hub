@@ -233,8 +233,11 @@ export const fr = {
   statusInProgress: 'En Cours',
   saveChanges: 'Enregistrer les Modifications',
   edit: 'Modifier',
+  delete: 'Supprimer',
+  confirmDeleteSession: 'Voulez-vous vraiment supprimer cette session de formation ?',
   actions: 'Actions',
   sessionUpdatedSuccessfully: 'mise à jour avec succès',
+  sessionDeletedSuccessfully: 'supprimée avec succès',
   sameTrainerWarning: 'Le co-formateur doit être différent du formateur principal.',
   endBeforeStartWarning: 'La date de fin doit être postérieure à la date de début.',
   // Settings — référentiel

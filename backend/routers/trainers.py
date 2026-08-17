@@ -43,8 +43,21 @@ def create_trainer(trainer: schemas.TrainerCreate, db: Session = Depends(get_db)
         center_obj = db.query(models.Center).filter(models.Center.nom_centre == trainer.center).first()
     if not center_obj and trainer.center_id:
         center_obj = db.query(models.Center).filter(models.Center.id == trainer.center_id).first()
-    center_id = center_obj.id if center_obj else 1
-    center_name = center_obj.nom_centre if center_obj else (trainer.center or "Ben Guerir")
+
+    if not center_obj and trainer.center:
+        center_obj = models.Center(nom_centre=trainer.center)
+        db.add(center_obj)
+        db.flush()
+
+    if not center_obj:
+        center_obj = db.query(models.Center).first()
+        if not center_obj:
+            center_obj = models.Center(nom_centre="Ben Guerir")
+            db.add(center_obj)
+            db.flush()
+
+    center_id = center_obj.id
+    center_name = center_obj.nom_centre
 
     new_user = models.User(
         employee_id=f"EMP{random.randint(1000,9999)}",
@@ -69,3 +82,22 @@ def create_trainer(trainer: schemas.TrainerCreate, db: Session = Depends(get_db)
         "domain": trainer.domain or "Digital",
         **_calculate_trainer_metrics(new_user.id),
     }
+
+@router.delete("/{trainer_id}")
+def delete_trainer(trainer_id: str, db: Session = Depends(get_db)):
+    try:
+        u_id = int(trainer_id)
+        user = db.query(models.User).filter(models.User.id == u_id).first()
+        if user:
+            db.query(models.Profile).filter(models.Profile.user_id == user.id).delete()
+            db.query(models.Activity).filter(models.Activity.trainer_id == user.id).delete()
+            db.query(models.WeeklyDeclaration).filter(models.WeeklyDeclaration.user_id == user.id).delete()
+            db.query(models.CapacityTarget).filter(models.CapacityTarget.user_id == user.id).delete()
+            db.query(models.Leave).filter(models.Leave.user_id == user.id).delete()
+            db.delete(user)
+            db.commit()
+            return {"message": "Formateur supprimé avec succès", "id": trainer_id}
+    except ValueError:
+        pass
+
+    return {"message": "Formateur supprimé", "id": trainer_id}

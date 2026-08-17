@@ -1,7 +1,7 @@
 'use client'
 
 import { Suspense, useEffect, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { KpiCards } from '@/components/dashboard/kpi-cards'
 import { ManagerChatbot } from '@/components/dashboard/manager-chatbot'
 import { PlanningView } from '@/components/dashboard/planning-view'
@@ -13,7 +13,6 @@ import { TrainerTable } from '@/components/dashboard/trainer-table'
 
 const VALID_TABS: TabType[] = ['dashboard', 'trainers', 'planning', 'settings']
 
-/** Résout `?tab=` vers un des 4 onglets. `activities` est un alias historique de `planning`. */
 function resolveTab(raw: string | null): TabType | null {
   if (!raw) return null
   if (raw === 'activities') return 'planning'
@@ -21,6 +20,7 @@ function resolveTab(raw: string | null): TabType | null {
 }
 
 function DashboardContent() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const tabParam = searchParams.get('tab')
 
@@ -31,14 +31,23 @@ function DashboardContent() {
 
   useEffect(() => {
     const resolved = resolveTab(tabParam)
-    if (resolved) setActiveTab(resolved)
+    setActiveTab(resolved || 'dashboard')
   }, [tabParam])
+
+  const handleSelectTab = (tab: TabType) => {
+    setActiveTab(tab)
+    if (tab === 'dashboard') {
+      router.push('/dashboard', { scroll: false })
+    } else {
+      router.push(`/dashboard?tab=${tab}`, { scroll: false })
+    }
+  }
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground text-xs antialiased">
       <Sidebar
         activeTab={activeTab}
-        onSelectTab={setActiveTab}
+        onSelectTab={handleSelectTab}
         selectedCenter={selectedCenter}
         onSelectCenter={setSelectedCenter}
       />

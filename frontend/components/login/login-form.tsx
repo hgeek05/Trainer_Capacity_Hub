@@ -3,7 +3,8 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { CalendarDays, Info, LayoutDashboard, LogIn } from 'lucide-react'
+import { AlertCircle, CalendarDays, Info, LayoutDashboard, Loader2, LogIn } from 'lucide-react'
+import { loginApi } from '@/lib/api'
 import type { LoginCopy } from './login-content'
 
 interface LoginFormProps {
@@ -12,7 +13,6 @@ interface LoginFormProps {
 
 const MANAGER_ROUTE = '/dashboard'
 const PLANNER_ROUTE = '/dashboard?tab=planning'
-
 const FIELD_CLASS =
   'w-full h-10 rounded-xl border border-border bg-secondary/40 px-3.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20'
 
@@ -45,11 +45,36 @@ export function LoginForm({ copy }: LoginFormProps) {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const handlePrefillDemo = (demoEmail: string) => {
+    setEmail(demoEmail)
+    setPassword('password123')
+    setErrorMsg(null)
+  }
 
-  // Démonstration : aucune vérification d'identifiants, la soumission ouvre le cockpit.
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    router.push(MANAGER_ROUTE)
+    setLoading(true)
+    setErrorMsg(null)
+    try {
+      const res = await loginApi({ email: email.trim(), password })
+      if (res && res.access_token) {
+        localStorage.setItem('access_token', res.access_token)
+        if (res.user) {
+          localStorage.setItem('current_user', JSON.stringify(res.user))
+        }
+        const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:'
+        document.cookie = `access_token=${res.access_token}; path=/; max-age=604800; SameSite=Lax${isSecure ? '; Secure' : ''}`
+        router.push(MANAGER_ROUTE)
+        return
+      }
+    } catch (err: any) {
+      console.warn('Real authentication error:', err)
+      setErrorMsg(err?.message || 'Email ou mot de passe incorrect.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -68,6 +93,12 @@ export function LoginForm({ copy }: LoginFormProps) {
 
         <h1 className="text-2xl font-bold tracking-tight text-foreground">{copy.formTitle}</h1>
         <p className="mt-1.5 text-xs text-muted-foreground">{copy.formSubtitle}</p>
+        {errorMsg && (
+          <div className="mt-4 flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs font-semibold text-rose-700 dark:text-rose-300 animate-in fade-in duration-150">
+            <AlertCircle className="size-4 shrink-0 text-rose-500" />
+            {errorMsg}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-7 space-y-4">
           <div>
@@ -107,37 +138,51 @@ export function LoginForm({ copy }: LoginFormProps) {
 
           <button
             type="submit"
-            className="mt-2 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground shadow-sm transition-all hover:opacity-90"
+            disabled={loading}
+            className="mt-2 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground shadow-sm transition-all hover:opacity-90 disabled:opacity-50"
           >
-            <LogIn className="size-4" />
-            {copy.submit}
+            {loading ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Connexion...
+              </>
+            ) : (
+              <>
+                <LogIn className="size-4" />
+                {copy.submit}
+              </>
+            )}
           </button>
         </form>
 
-        <div className="my-7 flex items-center gap-3">
-          <span className="h-px flex-1 bg-border" />
-          <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-            {copy.demoDivider}
-          </span>
-          <span className="h-px flex-1 bg-border" />
-        </div>
+        {process.env.NODE_ENV !== 'production' && (
+          <>
+            <div className="my-7 flex items-center gap-3">
+              <span className="h-px flex-1 bg-border" />
+              <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+                {copy.demoDivider}
+              </span>
+              <span className="h-px flex-1 bg-border" />
+            </div>
 
-        <div className="grid gap-2.5">
-          <DemoButton
-            icon={<LayoutDashboard className="size-4" />}
-            label={copy.demoManager}
-            hint={copy.demoManagerHint}
-            onClick={() => router.push(MANAGER_ROUTE)}
-          />
-          <DemoButton
-            icon={<CalendarDays className="size-4" />}
-            label={copy.demoPlanner}
-            hint={copy.demoPlannerHint}
-            onClick={() => router.push(PLANNER_ROUTE)}
-          />
-        </div>
+            <div className="grid gap-2.5">
+              <DemoButton
+                icon={<LayoutDashboard className="size-4" />}
+                label={copy.demoManager}
+                hint={copy.demoManagerHint}
+                onClick={() => handlePrefillDemo('manager@um6p.ma')}
+              />
+              <DemoButton
+                icon={<CalendarDays className="size-4" />}
+                label={copy.demoPlanner}
+                hint={copy.demoPlannerHint}
+                onClick={() => handlePrefillDemo('planificateur@um6p.ma')}
+              />
+            </div>
+          </>
+        )}
 
-        <p className="mt-6 flex items-start gap-2 rounded-xl border border-amber-500/25 bg-amber-500/10 p-3 text-[10px] leading-relaxed font-medium text-amber-700 dark:text-amber-300">
+        <p className="mt-6 flex items-start gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/10 p-3 text-[10px] leading-relaxed font-medium text-emerald-700 dark:text-emerald-300">
           <Info className="mt-px size-3 shrink-0" aria-hidden="true" />
           {copy.demoNotice}
         </p>

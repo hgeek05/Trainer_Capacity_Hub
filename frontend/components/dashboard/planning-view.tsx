@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Calendar, Plus, Search } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n'
+import { createSessionApi, deleteSessionApi, fetchSessions, updateSessionApi } from '@/lib/api'
 import { EditSessionModal } from '@/components/dashboard/planning/edit-session-modal'
 import { PlanningKpis } from '@/components/dashboard/planning/planning-kpis'
 import { PlanningSessionModal } from '@/components/dashboard/planning/planning-session-modal'
@@ -22,6 +23,14 @@ export function PlanningView() {
   const [editingSession, setEditingSession] = useState<PlanningSession | null>(null)
   const [notification, setNotification] = useState<string | null>(null)
 
+  useEffect(() => {
+    fetchSessions().then((data) => {
+      if (Array.isArray(data) && data.length > 0) {
+        setSessions(data)
+      }
+    })
+  }, [])
+
   const filteredSessions = sessions.filter((s) => {
     const matchesSearch =
       !searchQuery ||
@@ -32,15 +41,39 @@ export function PlanningView() {
     return matchesSearch && matchesCenter && matchesDomain
   })
 
-  const handleAddSession = (newSession: PlanningSession) => {
-    setSessions((prev) => [newSession, ...prev])
+  const handleAddSession = async (newSession: PlanningSession) => {
+    try {
+      const created = await createSessionApi(newSession)
+      setSessions((prev) => [created || newSession, ...prev])
+    } catch {
+      setSessions((prev) => [newSession, ...prev])
+    }
     setNotification(`✅ Session "${newSession.title}" ${t.scheduledSuccessfully} ${newSession.trainerName} !`)
     setTimeout(() => setNotification(null), 4000)
   }
 
-  const handleUpdateSession = (updated: PlanningSession) => {
+  const handleUpdateSession = async (updated: PlanningSession) => {
+    try {
+      await updateSessionApi(updated.id, updated)
+    } catch (err) {
+      console.error('API update session error:', err)
+    }
     setSessions((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))
     setNotification(`✅ Session "${updated.title}" ${t.sessionUpdatedSuccessfully} — ${updated.trainerName}`)
+    setTimeout(() => setNotification(null), 4000)
+  }
+
+  const handleDeleteSession = async (sessionToDelete: PlanningSession) => {
+    if (!window.confirm(`${t.confirmDeleteSession || 'Voulez-vous vraiment supprimer cette session ?'}\n"${sessionToDelete.title}"`)) {
+      return
+    }
+    try {
+      await deleteSessionApi(sessionToDelete.id)
+    } catch (err) {
+      console.error('API delete session error:', err)
+    }
+    setSessions((prev) => prev.filter((s) => s.id !== sessionToDelete.id))
+    setNotification(`🗑️ Session "${sessionToDelete.title}" ${t.sessionDeletedSuccessfully || 'supprimée avec succès'} !`)
     setTimeout(() => setNotification(null), 4000)
   }
 
@@ -118,7 +151,11 @@ export function PlanningView() {
         </div>
       </div>
 
-      <PlanningTable sessions={filteredSessions} onEditSession={setEditingSession} />
+      <PlanningTable
+        sessions={filteredSessions}
+        onEditSession={setEditingSession}
+        onDeleteSession={handleDeleteSession}
+      />
 
       <PlanningSessionModal
         isOpen={isModalOpen}

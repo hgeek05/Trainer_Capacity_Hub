@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fetchAiAnomalies, type AiAnomaly } from '@/lib/api'
+import { deleteTrainerApi, fetchAiAnomalies, type AiAnomaly } from '@/lib/api'
 import { exportTrainersCsv } from './export-helpers'
 import { getInitials } from './helpers'
 import { loadTrainerData } from './load-trainer-data'
@@ -89,8 +89,9 @@ export function useTrainerTable({
     setLoading(false)
   }
 
-  const handleTrainerAdded = (newT: { name: string; email?: string; center?: string; domain?: string; role?: string }) => {
+  const handleTrainerAdded = (newT: { id?: string | number; name: string; email?: string; center?: string; domain?: string; role?: string }) => {
     const newRow: TrainerRow = {
+      id: newT.id,
       name: newT.name,
       email: newT.email || `${newT.name.toLowerCase().replace(/\s+/g, '.')}@um6p.ma`,
       initials: getInitials(newT.name),
@@ -101,6 +102,22 @@ export function useTrainerTable({
       globalUsed: 0, globalTotal: 189, animUsed: 0, animTotal: 107, rate: 0, status: 'ok',
     }
     setTrainers((prev) => [newRow, ...prev])
+  }
+
+  const handleDeleteTrainer = async (trainer: TrainerRow) => {
+    if (!window.confirm(`Voulez-vous vraiment supprimer le formateur "${trainer.name}" ?`)) {
+      return
+    }
+    try {
+      if (trainer.id) {
+        await deleteTrainerApi(trainer.id)
+      }
+    } catch (err) {
+      console.warn('API delete trainer error:', err)
+    }
+    setTrainers((prev) => prev.filter((t) => t.name !== trainer.name && t.email !== trainer.email))
+    setExportNotification(`🗑️ Le formateur "${trainer.name}" a été supprimé avec succès.`)
+    setTimeout(() => setExportNotification(null), 3500)
   }
 
   const handleApplySimulation = (sourceName: string, targetName: string, days: number) => {
@@ -120,6 +137,6 @@ export function useTrainerTable({
   }
 
   return {
-    trainers, filteredTrainers, isLive, loading, analyzing, selectedCenter, setSelectedCenter, statusFilter, setStatusFilter, selectedPeriod, setSelectedPeriod, selectedDomain, setSelectedDomain, showAdvancedFilters, setShowAdvancedFilters, activeSearchQuery, handleSearchChange, aiAnomalies, setAiAnomalies, isAddModalOpen, setIsAddModalOpen, isSimulationOpen, setIsSimulationOpen, exportNotification, setExportNotification, runAiAnalysis, handleExport, handleRefreshData, handleTrainerAdded, handleApplySimulation,
+    trainers, filteredTrainers, isLive, loading, analyzing, selectedCenter, setSelectedCenter, statusFilter, setStatusFilter, selectedPeriod, setSelectedPeriod, selectedDomain, setSelectedDomain, showAdvancedFilters, setShowAdvancedFilters, activeSearchQuery, handleSearchChange, aiAnomalies, setAiAnomalies, isAddModalOpen, setIsAddModalOpen, isSimulationOpen, setIsSimulationOpen, exportNotification, setExportNotification, runAiAnalysis, handleExport, handleRefreshData, handleTrainerAdded, handleDeleteTrainer, handleApplySimulation,
   }
 }

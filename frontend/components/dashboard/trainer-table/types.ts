@@ -1,6 +1,7 @@
 export type TrainerStatus = 'ok' | 'watch' | 'blocked'
 
 export interface TrainerRow {
+  id?: string | number
   name: string
   email: string
   initials: string

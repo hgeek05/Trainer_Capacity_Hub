@@ -6,9 +6,10 @@ import { useLanguage } from '@/lib/i18n'
 
 interface TrainersGridProps {
   trainers: TrainerRow[]
+  onDeleteTrainer?: (trainer: TrainerRow) => void
 }
 
-export function TrainersGrid({ trainers }: TrainersGridProps) {
+export function TrainersGrid({ trainers, onDeleteTrainer }: TrainersGridProps) {
   const { t } = useLanguage()
 
   return (
@@ -22,16 +23,17 @@ export function TrainersGrid({ trainers }: TrainersGridProps) {
             <th scope="col" className="px-3 py-2.5 font-medium">{t.animation}</th>
             <th scope="col" className="px-3 py-2.5 font-medium">{t.rate}</th>
             <th scope="col" className="px-4 py-2.5 font-medium">{t.status}</th>
+            <th scope="col" className="px-3 py-2.5 font-medium text-right">{t.actions || 'Actions'}</th>
           </tr>
         </thead>
         <tbody>
           {trainers.length > 0 ? (
             trainers.map((trainer) => (
-              <TrainerRowItem key={trainer.name} trainer={trainer} t={t} />
+              <TrainerRowItem key={trainer.name} trainer={trainer} t={t} onDeleteTrainer={onDeleteTrainer} />
             ))
           ) : (
             <tr>
-              <td colSpan={6} className="px-5 py-8 text-center text-xs text-muted-foreground font-medium">
+              <td colSpan={7} className="px-5 py-8 text-center text-xs text-muted-foreground font-medium">
                 {t.noTrainersFound}
               </td>
             </tr>

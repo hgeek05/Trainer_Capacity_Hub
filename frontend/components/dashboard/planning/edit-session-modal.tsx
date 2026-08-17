@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { AlertTriangle, CalendarDays, DoorOpen, MapPin, Pencil, Users, X } from 'lucide-react'
+import { fetchTrainers } from '@/lib/api'
 import { useLanguage } from '@/lib/i18n'
 import type { PlanningSession } from './planning-data'
 import {
@@ -45,6 +46,7 @@ export function EditSessionModal({ session, onClose, onSave }: EditSessionModalP
 
   const [center, setCenter] = useState('')
   const [room, setRoom] = useState('')
+  const [trainersList, setTrainersList] = useState<string[]>(TRAINER_POOL)
   const [mainTrainer, setMainTrainer] = useState('')
   const [coTrainer, setCoTrainer] = useState('')
   const [startDate, setStartDate] = useState('')
@@ -61,6 +63,16 @@ export function EditSessionModal({ session, onClose, onSave }: EditSessionModalP
     setStartDate(session.startDate)
     setEndDate(session.endDate)
     setStatus(session.status)
+
+    fetchTrainers()
+      .then((data) => {
+        if (data && data.length > 0) {
+          const dynamicNames = data.map((t: any) => t.name).filter(Boolean)
+          const combined = Array.from(new Set([...dynamicNames, ...TRAINER_POOL, session.trainerName]))
+          setTrainersList(combined)
+        }
+      })
+      .catch((err) => console.warn('Failed to fetch dynamic trainers for edit modal:', err))
   }, [session])
 
   if (!session) return null
@@ -186,7 +198,7 @@ export function EditSessionModal({ session, onClose, onSave }: EditSessionModalP
                   onChange={(e) => setMainTrainer(e.target.value)}
                   className={SELECT_CLASS}
                 >
-                  {TRAINER_POOL.map((name) => (
+                  {trainersList.map((name) => (
                     <option key={name} value={name}>
                       {name}
                     </option>
@@ -204,7 +216,7 @@ export function EditSessionModal({ session, onClose, onSave }: EditSessionModalP
                   className={SELECT_CLASS}
                 >
                   <option value="">{t.noCoTrainer}</option>
-                  {TRAINER_POOL.filter((name) => name !== mainTrainer).map((name) => (
+                  {trainersList.filter((name) => name !== mainTrainer).map((name) => (
                     <option key={name} value={name}>
                       {name}
                     </option>

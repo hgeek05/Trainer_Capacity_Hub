@@ -1,9 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Plus, X } from 'lucide-react'
+import { fetchTrainers } from '@/lib/api'
 import { useLanguage } from '@/lib/i18n'
 import type { PlanningSession } from '@/components/dashboard/planning-view'
+import { TRAINER_POOL } from '@/components/dashboard/planning/planning-reference'
 
 interface PlanningSessionModalProps {
   isOpen: boolean
@@ -21,12 +23,29 @@ export function PlanningSessionModal({
   const { t } = useLanguage()
 
   const [newTitle, setNewTitle] = useState('')
+  const [trainersList, setTrainersList] = useState<string[]>(TRAINER_POOL)
   const [newTrainer, setNewTrainer] = useState('Fatima Ait Zzi')
   const [newDomain, setNewDomain] = useState('HSE')
   const [newCenter, setNewCenter] = useState('Ben Guerir')
   const [newStartDate, setNewStartDate] = useState('2026-08-15')
   const [newEndDate, setNewEndDate] = useState('2026-08-20')
   const [newDuration, setNewDuration] = useState(5)
+
+  useEffect(() => {
+    if (!isOpen) return
+    fetchTrainers()
+      .then((data) => {
+        if (data && data.length > 0) {
+          const dynamicNames = data.map((t: any) => t.name).filter(Boolean)
+          const combined = Array.from(new Set([...dynamicNames, ...TRAINER_POOL]))
+          setTrainersList(combined)
+          if (!combined.includes(newTrainer) && combined.length > 0) {
+            setNewTrainer(combined[0])
+          }
+        }
+      })
+      .catch((err) => console.warn('Failed to fetch dynamic trainers:', err))
+  }, [isOpen])
 
   if (!isOpen) return null
 
@@ -89,12 +108,11 @@ export function PlanningSessionModal({
                 onChange={(e) => setNewTrainer(e.target.value)}
                 className="w-full h-9 rounded-lg border border-border bg-secondary/50 px-3 text-xs text-foreground focus:outline-none cursor-pointer"
               >
-                <option value="Fatima Ait Zzi">Fatima Ait Zzi</option>
-                <option value="Nadia Amrani">Nadia Amrani</option>
-                <option value="Omar Chraibi">Omar Chraibi</option>
-                <option value="Karim Tazi">Karim Tazi</option>
-                <option value="Fatima Zahra El Idrissi">Fatima Zahra El Idrissi</option>
-                <option value="Youssef Benali">Youssef Benali</option>
+                {trainersList.map((tName) => (
+                  <option key={tName} value={tName}>
+                    {tName}
+                  </option>
+                ))}
               </select>
             </div>
 

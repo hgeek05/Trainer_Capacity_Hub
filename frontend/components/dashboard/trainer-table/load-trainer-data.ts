@@ -22,6 +22,7 @@ export async function loadTrainerData(): Promise<{ trainers: TrainerRow[]; isLiv
       const domain = item.domain || DOMAINS[idx % DOMAINS.length]
 
       return {
+        id: item.id,
         name,
         email,
         initials: getInitials(name),

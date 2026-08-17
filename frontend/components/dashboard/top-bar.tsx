@@ -1,5 +1,7 @@
 'use client'
 
+import React, { useEffect, useState } from 'react'
+import { User } from 'lucide-react'
 import { LanguageToggle } from '@/components/language-toggle'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { NotificationPopover } from '@/components/dashboard/top-bar/notification-popover'
@@ -15,6 +17,13 @@ interface TopBarProps {
   onSearchChange?: (query: string) => void
 }
 
+interface UserProfile {
+  name: string
+  email: string
+  role: string
+  center: string
+}
+
 export function TopBar({
   period = 'year',
   onSelectPeriod,
@@ -23,12 +32,34 @@ export function TopBar({
   onSearchChange,
 }: TopBarProps) {
   const { t } = useLanguage()
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null)
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('current_user')
+      if (stored) {
+        setCurrentUser(JSON.parse(stored))
+      }
+    } catch (e) {
+      console.warn('Failed to parse current user from localStorage:', e)
+    }
+  }, [])
 
   const periods = [
     { value: 'week' as const, label: t.week || 'Semaine' },
     { value: 'month' as const, label: t.month || 'Mois' },
     { value: 'year' as const, label: t.year || 'Année' },
   ]
+
+  const displayName = currentUser?.name || t.superAdmin || 'Super Admin'
+  const displayRole = currentUser?.role || 'Manager TechniX'
+  const displayCenter = currentUser?.center || (selectedCenter !== 'ALL' ? selectedCenter : 'Réseau UM6P')
+  const initials = displayName
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase()
 
   return (
     <header className="flex flex-col gap-4 border-b border-border bg-card px-6 py-4 xl:flex-row xl:items-center xl:justify-between relative z-40">
@@ -71,6 +102,16 @@ export function TopBar({
 
         {/* Popover des notifications et alertes dynamiques */}
         <NotificationPopover selectedCenter={selectedCenter} />
+
+        {/* Profil compact (icône seule avec initiales) */}
+        <div className="pl-2 border-l border-border">
+          <div
+            title={`${displayName} (${displayRole} • ${displayCenter})`}
+            className="flex size-8.5 items-center justify-center rounded-full bg-primary/10 font-bold text-xs text-primary border border-primary/20 shadow-xs cursor-default shrink-0"
+          >
+            {initials || <User className="size-4" />}
+          </div>
+        </div>
       </div>
     </header>
   )

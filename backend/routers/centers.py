@@ -18,10 +18,14 @@ DEFAULT_CENTERS = [
 def get_centers(db: Session = Depends(get_db)):
     try:
         centers = db.query(models.Center).all()
-        # Filtrer strictement pour ne garder QUE les 4 centres officiels de la BDD
         official_centers = [c for c in centers if c.nom_centre in OFFICIAL_CENTERS]
         if not official_centers:
-            return DEFAULT_CENTERS
+            for name in OFFICIAL_CENTERS:
+                c = models.Center(nom_centre=name)
+                db.add(c)
+            db.commit()
+            centers = db.query(models.Center).all()
+            official_centers = [c for c in centers if c.nom_centre in OFFICIAL_CENTERS]
         return [{"id": c.id, "nom_centre": c.nom_centre} for c in official_centers]
     except Exception as e:
         print("Database error in get_centers:", e)

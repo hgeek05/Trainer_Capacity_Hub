@@ -1,42 +1,45 @@
 'use client'
 
 import React from 'react'
-import { Clock, DoorOpen, MapPin, Pencil, Sparkles, UserCheck, Users } from 'lucide-react'
+import { Clock, DoorOpen, MapPin, Pencil, Sparkles, Trash2, UserCheck, Users } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 import type { PlanningSession } from './planning-data'
 
 interface PlanningTableProps {
   sessions: PlanningSession[]
-  /** Ouvre le modal d'édition. La colonne Actions n'apparaît que si le handler est fourni. */
+  /** Ouvre le modal d'édition. La colonne Actions n'apparaît que si au moins un handler est fourni. */
   onEditSession?: (session: PlanningSession) => void
+  onDeleteSession?: (session: PlanningSession) => void
 }
 
-export function PlanningTable({ sessions, onEditSession }: PlanningTableProps) {
+export function PlanningTable({ sessions, onEditSession, onDeleteSession }: PlanningTableProps) {
   const { t, lang } = useLanguage()
+
+  const hasActions = Boolean(onEditSession || onDeleteSession)
 
   return (
     <div className="overflow-x-auto rounded-xl border border-border">
       <table className="w-full text-left text-xs">
         <thead className="border-b border-border bg-secondary/50 font-bold uppercase tracking-wider text-[10px] text-muted-foreground">
           <tr>
-            <th className="px-4 py-3">ID</th>
-            <th className="px-4 py-3">{t.courseTitleLabel.replace(' *', '')}</th>
-            <th className="px-4 py-3">{t.trainer}</th>
-            <th className="px-4 py-3">{t.domainPole}</th>
-            <th className="px-4 py-3">{t.center}</th>
-            <th className="px-4 py-3">{t.period}</th>
-            <th className="px-4 py-3">{t.days}</th>
-            <th className="px-4 py-3">{t.status}</th>
-            {onEditSession && <th className="px-4 py-3 text-right">{t.actions}</th>}
+            <th className="px-4 py-3 text-left">ID</th>
+            <th className="px-4 py-3 text-left">{t.courseTitleLabel.replace(' *', '')}</th>
+            <th className="px-4 py-3 text-left">{t.trainer}</th>
+            <th className="px-4 py-3 text-left">{t.domainPole}</th>
+            <th className="px-4 py-3 text-left">{t.center}</th>
+            <th className="px-4 py-3 text-left whitespace-nowrap">{t.period}</th>
+            <th className="px-4 py-3 text-center w-16">{lang === 'en' ? 'DURATION' : 'DURÉE'}</th>
+            <th className="px-4 py-3 text-left">{t.status}</th>
+            {hasActions && <th className="px-4 py-3 text-right">{t.actions}</th>}
           </tr>
         </thead>
         <tbody className="divide-y divide-border/60 bg-card">
           {sessions.map((session) => (
             <tr key={session.id} className="hover:bg-secondary/30 transition-colors">
-              <td className="px-4 py-3 font-mono text-xs font-medium text-slate-500 dark:text-slate-400">{session.id}</td>
-              <td className="px-4 py-3 font-semibold text-foreground">{session.title}</td>
-              <td className="px-4 py-3 font-medium text-foreground">
+              <td className="px-4 py-3 text-left font-mono text-xs font-medium text-slate-500 dark:text-slate-400">{session.id}</td>
+              <td className="px-4 py-3 text-left font-semibold text-foreground">{session.title}</td>
+              <td className="px-4 py-3 text-left font-medium text-foreground">
                 <span className="flex items-center gap-1.5">
                   <UserCheck className="size-3.5 text-slate-400" />
                   {session.trainerName}
@@ -48,13 +51,13 @@ export function PlanningTable({ sessions, onEditSession }: PlanningTableProps) {
                   </span>
                 )}
               </td>
-              <td className="px-4 py-3">
+              <td className="px-4 py-3 text-left">
                 <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 px-2.5 py-0.5 text-xs font-medium text-slate-700 dark:text-slate-300">
                   <Sparkles className="size-2.5 text-slate-400" />
                   {session.trainerDomain}
                 </span>
               </td>
-              <td className="px-4 py-3 font-medium text-muted-foreground">
+              <td className="px-4 py-3 text-left font-medium text-muted-foreground">
                 <span className="flex items-center gap-1 text-slate-700 dark:text-slate-300 text-xs">
                   <MapPin className="size-3 text-slate-400" />
                   {session.center}
@@ -66,11 +69,15 @@ export function PlanningTable({ sessions, onEditSession }: PlanningTableProps) {
                   </span>
                 )}
               </td>
-              <td className="px-4 py-3 text-muted-foreground font-mono text-[11px]">
+              <td className="px-4 py-3 text-left text-muted-foreground font-mono text-[11px] whitespace-nowrap">
                 {session.startDate} ➔ {session.endDate}
               </td>
-              <td className="px-4 py-3 font-bold text-foreground">{session.durationDays}{t.days}</td>
-              <td className="px-4 py-3">
+              <td className="px-4 py-3 text-center">
+                <span className="inline-flex items-center justify-center w-14 py-0.5 rounded-md bg-secondary/80 font-bold font-mono text-xs text-foreground">
+                  {session.durationDays}j
+                </span>
+              </td>
+              <td className="px-4 py-3 text-left">
                 <span
                   className={cn(
                     'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold border',
@@ -85,17 +92,32 @@ export function PlanningTable({ sessions, onEditSession }: PlanningTableProps) {
                   {session.status === 'IN_PROGRESS' ? (lang === 'en' ? 'Ongoing' : 'En Cours') : session.status === 'CONFIRMED' ? (lang === 'en' ? 'Confirmed' : 'Confirmé') : (lang === 'en' ? 'Scheduled' : 'Planifié')}
                 </span>
               </td>
-              {onEditSession && (
+              {hasActions && (
                 <td className="px-4 py-3 text-right">
-                  <button
-                    type="button"
-                    onClick={() => onEditSession(session)}
-                    aria-label={`${t.edit} ${session.id}`}
-                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 transition-colors hover:bg-secondary hover:text-foreground"
-                  >
-                    <Pencil className="size-3 text-slate-400" />
-                    {t.edit}
-                  </button>
+                  <div className="flex items-center justify-end gap-1">
+                    {onEditSession && (
+                      <button
+                        type="button"
+                        onClick={() => onEditSession(session)}
+                        aria-label={`${t.edit} ${session.id}`}
+                        title={t.edit}
+                        className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-border bg-card p-1.5 text-slate-500 hover:bg-secondary hover:text-foreground transition-colors"
+                      >
+                        <Pencil className="size-3.5" />
+                      </button>
+                    )}
+                    {onDeleteSession && (
+                      <button
+                        type="button"
+                        onClick={() => onDeleteSession(session)}
+                        aria-label={`${t.delete} ${session.id}`}
+                        title={t.delete}
+                        className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-500/10 p-1.5 text-rose-500 hover:bg-rose-500/20 hover:text-rose-600 transition-colors"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </button>
+                    )}
+                  </div>
                 </td>
               )}
             </tr>

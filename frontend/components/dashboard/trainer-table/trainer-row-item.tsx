@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { Trash2 } from 'lucide-react'
 import { LoadCell } from '@/components/dashboard/trainer-table/load-cell'
 import type { TrainerRow } from '@/components/dashboard/trainer-table/types'
 import { cn } from '@/lib/utils'
@@ -8,9 +9,10 @@ import { cn } from '@/lib/utils'
 interface TrainerRowItemProps {
   trainer: TrainerRow
   t: any
+  onDeleteTrainer?: (trainer: TrainerRow) => void
 }
 
-export function TrainerRowItem({ trainer, t }: TrainerRowItemProps) {
+export function TrainerRowItem({ trainer, t, onDeleteTrainer }: TrainerRowItemProps) {
   const isOverloaded = trainer.animUsed > 107
 
   return (
@@ -69,6 +71,19 @@ export function TrainerRowItem({ trainer, t }: TrainerRowItemProps) {
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
             ✅ {t.balanced}
           </span>
+        )}
+      </td>
+      <td className="px-3 py-2 text-right">
+        {onDeleteTrainer && (
+          <button
+            type="button"
+            onClick={() => onDeleteTrainer(trainer)}
+            title="Supprimer le formateur"
+            aria-label={`Supprimer ${trainer.name}`}
+            className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-500/10 p-1.5 text-rose-500 hover:bg-rose-500/20 hover:text-rose-600 transition-colors"
+          >
+            <Trash2 className="size-3.5" />
+          </button>
         )}
       </td>
     </tr>

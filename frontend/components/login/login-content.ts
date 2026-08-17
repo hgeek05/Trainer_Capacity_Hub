@@ -45,7 +45,7 @@ export const loginContent: Record<Lang, LoginCopy> = {
     demoPlanner: 'Connexion Planificateur',
     demoPlannerHint: 'Planning & affectations',
     backToHome: "← Retour à l'accueil",
-    demoNotice: 'Environnement de démonstration — aucune authentification réelle.',
+    demoNotice: 'Plateforme sécurisée — Connectez-vous avec vos identifiants UM6P / OCP.',
   },
   en: {
     brandTag: 'UM6P TechniX',
@@ -70,6 +70,6 @@ export const loginContent: Record<Lang, LoginCopy> = {
     demoPlanner: 'Planner Sign-in',
     demoPlannerHint: 'Planning & assignments',
     backToHome: '← Back to home',
-    demoNotice: 'Demonstration environment — no real authentication.',
+    demoNotice: 'Secured platform — Sign in with your UM6P / OCP credentials.',
   },
 }

@@ -76,3 +76,44 @@ class TrainerDashboardItem(BaseModel):
     statut_fenetre: str
     taux: int
     alerte: str
+
+class PlanningSessionCreate(BaseModel):
+    id: Optional[str] = None
+    title: str = Field(..., min_length=2, max_length=200)
+    trainerName: str = Field(..., min_length=2, max_length=100)
+    trainerDomain: str = Field(..., max_length=100)
+    center: str = Field(..., max_length=100)
+    startDate: str = Field(..., max_length=20)
+    endDate: str = Field(..., max_length=20)
+    durationDays: int = Field(..., ge=1, le=365)
+    status: str = Field("CONFIRMED", max_length=50)
+    room: Optional[str] = None
+    coTrainerName: Optional[str] = None
+
+class PlanningSessionUpdate(BaseModel):
+    title: Optional[str] = None
+    trainerName: Optional[str] = None
+    trainerDomain: Optional[str] = None
+    center: Optional[str] = None
+    startDate: Optional[str] = None
+    endDate: Optional[str] = None
+    durationDays: Optional[int] = None
+    status: Optional[str] = None
+    room: Optional[str] = None
+    coTrainerName: Optional[str] = None
+
+class PlanningSessionResponse(BaseModel):
+    id: str
+    title: str
+    trainerName: str
+    trainerDomain: str
+    center: str
+    startDate: str
+    endDate: str
+    durationDays: int
+    status: str
+    room: Optional[str] = None
+    coTrainerName: Optional[str] = None
+
+    class Config:
+        from_attributes = True

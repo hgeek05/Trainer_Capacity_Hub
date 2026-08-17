@@ -161,3 +161,17 @@ class Leave(Base):
     end_date = Column(Date)
     status = Column(String)
     user = relationship("User", back_populates="leaves")
+
+class PlanningSession(Base):
+    __tablename__ = "planning_sessions"
+    id = Column(String, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    trainer_name = Column(String, nullable=False)
+    trainer_domain = Column(String, nullable=False)
+    center = Column(String, nullable=False)
+    start_date = Column(String, nullable=False)
+    end_date = Column(String, nullable=False)
+    duration_days = Column(Integer, nullable=False)
+    status = Column(String, nullable=False, default="SCHEDULED")
+    room = Column(String, nullable=True)
+    co_trainer_name = Column(String, nullable=True)

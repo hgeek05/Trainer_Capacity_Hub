@@ -39,10 +39,11 @@ def create_fake_trainers(n=50):
                 counter += 1
             used_emails.add(email)
 
+            from routers.auth import _hash_password
             user = models.User(
                 employee_id=f"EMP{fake.unique.random_number(digits=4)}",
                 email=email,
-                password_hash="hashed_password_123",
+                password_hash=_hash_password("password123"),
                 role_id=trainer_role.id,
                 is_active=True,
             )
@@ -102,5 +103,27 @@ def fix_all_user_emails():
         db.close()
 
 
+def seed_initial_passwords():
+    from routers.auth import _hash_password
+    db = SessionLocal()
+    try:
+        users = db.query(models.User).all()
+        default_hash = _hash_password("password123")
+        updated = 0
+        for u in users:
+            if not u.password_hash or u.password_hash.startswith("hashed_password"):
+                u.password_hash = default_hash
+                updated += 1
+        if updated > 0:
+            db.commit()
+            print(f"Mise à jour des mots de passe : {updated} utilisateurs configurés avec le hash de password123")
+    except Exception as e:
+        db.rollback()
+        print(f"Erreur lors de la mise à jour des mots de passe : {e}")
+    finally:
+        db.close()
+
+
 if __name__ == "__main__":
     fix_all_user_emails()
+    seed_initial_passwords()

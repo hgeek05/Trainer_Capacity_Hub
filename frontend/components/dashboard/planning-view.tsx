@@ -22,14 +22,26 @@ export function PlanningView() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingSession, setEditingSession] = useState<PlanningSession | null>(null)
   const [notification, setNotification] = useState<string | null>(null)
+  const [currentUser, setCurrentUser] = useState<{ role?: string } | null>(null)
 
   useEffect(() => {
+    try {
+      const stored = localStorage.getItem('current_user')
+      if (stored) {
+        setCurrentUser(JSON.parse(stored))
+      }
+    } catch (e) {
+      console.warn('Failed to parse current_user:', e)
+    }
+
     fetchSessions().then((data) => {
       if (Array.isArray(data) && data.length > 0) {
         setSessions(data)
       }
     })
   }, [])
+
+  const isTrainer = currentUser?.role === 'Formateur'
 
   const filteredSessions = sessions.filter((s) => {
     const matchesSearch =
@@ -83,20 +95,33 @@ export function PlanningView() {
     <div className="flex flex-col gap-6 rounded-2xl border border-border bg-card p-6 shadow-xs animate-in fade-in duration-200">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div>
-          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-            <Calendar className="size-5 text-primary" />
-            {t.planningViewTitle}
-          </h2>
-          <p className="text-xs text-muted-foreground mt-1">{t.planningViewSubtitle}</p>
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+              <Calendar className="size-5 text-primary" />
+              {isTrainer ? "Planning Général des Sessions" : t.planningViewTitle}
+            </h2>
+            {isTrainer && (
+              <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">
+                Lecture seule
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            {isTrainer 
+              ? "Consultation du calendrier et de la programmation des sessions du réseau TechniX / UM6P."
+              : t.planningViewSubtitle}
+          </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-purple-700 cursor-pointer"
-        >
-          <Plus className="size-4" />
-          {t.scheduleSession}
-        </button>
+        {!isTrainer && (
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className="inline-flex items-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-purple-700 cursor-pointer"
+          >
+            <Plus className="size-4" />
+            {t.scheduleSession}
+          </button>
+        )}
       </div>
 
       {notification && (
@@ -153,8 +178,8 @@ export function PlanningView() {
 
       <PlanningTable
         sessions={filteredSessions}
-        onEditSession={setEditingSession}
-        onDeleteSession={handleDeleteSession}
+        onEditSession={!isTrainer ? setEditingSession : undefined}
+        onDeleteSession={!isTrainer ? handleDeleteSession : undefined}
       />
 
       <PlanningSessionModal

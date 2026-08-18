@@ -2,13 +2,13 @@
 
 import React, { useEffect, useState } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import { Calendar, LayoutDashboard, LogOut, Settings, User, Users } from 'lucide-react'
+import { Calendar, LayoutDashboard, LogOut, Settings, User, Users, UserCheck } from 'lucide-react'
 import Link from 'next/link'
 import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 import { SidebarLogo } from '@/components/dashboard/sidebar/sidebar-logo'
 import { SidebarCenters } from '@/components/dashboard/sidebar/sidebar-centers'
-export type TabType = 'dashboard' | 'trainers' | 'planning' | 'settings'
+export type TabType = 'dashboard' | 'trainers' | 'planning' | 'settings' | 'trainer'
 
 interface MainNavItem {
   id: TabType
@@ -51,15 +51,24 @@ export function Sidebar({
     }
   }, [])
 
-  const mainItems: MainNavItem[] = [
-    { id: 'dashboard', label: t.dashboard, hint: t.tabHintDashboard, icon: LayoutDashboard },
-    { id: 'trainers', label: t.trainers, hint: t.tabHintTrainers, icon: Users },
-    { id: 'planning', label: t.planning, hint: t.tabHintPlanning, icon: Calendar },
-    { id: 'settings', label: t.settings, hint: t.tabHintSettings, icon: Settings },
-  ]
+  const isTrainer = currentUser?.role === 'Formateur'
+
+  const mainItems: MainNavItem[] = isTrainer
+    ? [
+        { id: 'trainer', label: "Mon Espace", hint: "Activité & Charge", icon: UserCheck },
+        { id: 'planning', label: "Planning Général", hint: "Calendrier des sessions", icon: Calendar },
+        { id: 'settings', label: t.settings, hint: t.tabHintSettings, icon: Settings },
+      ]
+    : [
+        { id: 'dashboard', label: t.dashboard, hint: t.tabHintDashboard, icon: LayoutDashboard },
+        { id: 'trainers', label: t.trainers, hint: t.tabHintTrainers, icon: Users },
+        { id: 'planning', label: t.planning, hint: t.tabHintPlanning, icon: Calendar },
+        { id: 'trainer', label: "Espace Formateur", hint: "Vue intervenant", icon: UserCheck },
+        { id: 'settings', label: t.settings, hint: t.tabHintSettings, icon: Settings },
+      ]
 
   const displayName = currentUser?.name || t.superAdmin || 'Super Admin'
-  const displayRole = currentUser?.role && currentUser.role !== 'Formateur' ? currentUser.role : 'Manager'
+  const displayRole = currentUser?.role || 'Formateur'
   const displayCenter = currentUser?.center || (selectedCenter !== 'ALL' ? selectedCenter : 'Ben Guerir')
   const displaySubtext = `${displayRole} • ${displayCenter}`
   const initials = displayName

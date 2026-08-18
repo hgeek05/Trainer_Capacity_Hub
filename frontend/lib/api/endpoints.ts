@@ -127,9 +127,37 @@ export async function deleteSessionApi(sessionId: string) {
 }
 
 export async function loginApi(credentials: { email: string; password: string }) {
-  return apiFetch<{ access_token: string; token_type: string; user: any }>('/auth/login', {
+  return apiFetch<{ status?: string; email?: string; message?: string; dev_code?: string; access_token?: string; token_type?: string; user?: any }>('/auth/login', {
     method: 'POST',
     body: JSON.stringify(credentials),
+  });
+}
+
+export async function verify2faApi(payload: { email: string; code: string }) {
+  return apiFetch<{ status: string; access_token: string; token_type: string; user: any }>('/auth/verify-2fa', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function resend2faApi(email: string) {
+  return apiFetch<{ status: string; message: string; dev_code?: string }>('/auth/resend-2fa', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function forgotPasswordApi(email: string) {
+  return apiFetch<{ message: string; dev_link?: string }>('/auth/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function resetPasswordApi(token: string, new_password: string) {
+  return apiFetch<{ status: string; message: string }>('/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({ token, new_password }),
   });
 }
 
@@ -138,3 +166,33 @@ export async function deleteTrainerApi(trainerId: string | number) {
     method: 'DELETE',
   });
 }
+
+export interface ProfileData {
+  user_id: number;
+  employee_id?: string;
+  email: string;
+  first_name?: string;
+  last_name?: string;
+  job_title?: string;
+  home_center_id?: number;
+  specialty_id?: number;
+  phone?: string;
+  bio?: string;
+  hire_date?: string;
+  manager_id?: number;
+  role_name?: string;
+  center_name?: string;
+  specialty_name?: string;
+}
+
+export async function getProfileApi(userId: number) {
+  return apiFetch<ProfileData>(`/profile/${userId}`);
+}
+
+export async function updateProfileApi(userId: number, payload: Partial<ProfileData>) {
+  return apiFetch<{ status: string; message: string; profile: ProfileData }>(`/profile/${userId}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+}
+

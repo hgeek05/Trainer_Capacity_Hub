@@ -4,9 +4,24 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from database import engine, Base
-from routers import capacity, users, trainers, ai_router, centers, calendar_router, sessions, auth
+from routers import capacity, users, trainers, ai_router, centers, calendar_router, sessions, auth, profiles
+
+from sqlalchemy import text
 
 Base.metadata.create_all(bind=engine)
+
+# Auto-migration pour les colonnes de sécurité et profil
+try:
+    with engine.connect() as conn:
+        conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token VARCHAR;"))
+        conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires TIMESTAMP;"))
+        conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS two_factor_code VARCHAR;"))
+        conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS two_factor_expires TIMESTAMP;"))
+        conn.execute(text("ALTER TABLE profiles ADD COLUMN IF NOT EXISTS phone VARCHAR;"))
+        conn.execute(text("ALTER TABLE profiles ADD COLUMN IF NOT EXISTS bio TEXT;"))
+        conn.commit()
+except Exception as e:
+    print(f"[DB Migration Note] {e}")
 
 # Logger setup
 logging.basicConfig(level=logging.INFO)
@@ -68,6 +83,7 @@ app.include_router(centers.router)
 app.include_router(calendar_router.router)
 app.include_router(sessions.router)
 app.include_router(auth.router)
+app.include_router(profiles.router)
 
 @app.on_event("startup")
 def startup_db_cleanup():
@@ -84,11 +100,10 @@ def startup_db_cleanup():
     except Exception as e:
         logger.warning(f"Startup center seeding notice: {e}")
     try:
-        from generate_mock_data import fix_all_user_emails, seed_initial_passwords
-        fix_all_user_emails()
+        from generate_mock_data import seed_initial_passwords
         seed_initial_passwords()
     except Exception as e:
-        logger.warning(f"Startup email/password cleanup notice: {e}")
+        logger.warning(f"Startup password cleanup notice: {e}")
 
 @app.get("/")
 def read_root():

@@ -117,3 +117,33 @@ class PlanningSessionResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ProfileUpdateSchema(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    job_title: Optional[str] = None
+    specialty_id: Optional[int] = None
+    home_center_id: Optional[int] = None
+    phone: Optional[str] = None
+    bio: Optional[str] = None
+
+class ProfileResponseSchema(BaseModel):
+    user_id: int
+    employee_id: Optional[str] = None
+    email: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    job_title: Optional[str] = None
+    home_center_id: Optional[int] = None
+    specialty_id: Optional[int] = None
+    phone: Optional[str] = None
+    bio: Optional[str] = None
+    hire_date: Optional[date] = None
+    manager_id: Optional[int] = None
+    role_name: Optional[str] = None
+    center_name: Optional[str] = None
+    specialty_name: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+

@@ -10,10 +10,12 @@ import { Sidebar, type TabType } from '@/components/dashboard/sidebar'
 import { ActivitiesView, SettingsView, TrainersView } from '@/components/dashboard/sub-views'
 import { TopBar } from '@/components/dashboard/top-bar'
 import { TrainerTable } from '@/components/dashboard/trainer-table'
+import { TrainerSpaceView } from '@/components/dashboard/trainer-space-view'
 
-const VALID_TABS: TabType[] = ['dashboard', 'trainers', 'planning', 'settings']
+const VALID_TABS: TabType[] = ['dashboard', 'trainers', 'planning', 'settings', 'trainer']
 
-function resolveTab(raw: string | null): TabType | null {
+function resolveTab(raw: string | null, view: string | null): TabType | null {
+  if (view === 'trainer' || raw === 'trainer') return 'trainer'
   if (!raw) return null
   if (raw === 'activities') return 'planning'
   return VALID_TABS.includes(raw as TabType) ? (raw as TabType) : null
@@ -23,6 +25,7 @@ function DashboardContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const tabParam = searchParams.get('tab')
+  const viewParam = searchParams.get('view')
 
   const [activeTab, setActiveTab] = useState<TabType>('dashboard')
   const [selectedCenter, setSelectedCenter] = useState<string>('ALL')
@@ -30,9 +33,9 @@ function DashboardContent() {
   const [searchQuery, setSearchQuery] = useState<string>('')
 
   useEffect(() => {
-    const resolved = resolveTab(tabParam)
+    const resolved = resolveTab(tabParam, viewParam)
     setActiveTab(resolved || 'dashboard')
-  }, [tabParam])
+  }, [tabParam, viewParam])
 
   const handleSelectTab = (tab: TabType) => {
     setActiveTab(tab)
@@ -79,6 +82,7 @@ function DashboardContent() {
             </div>
           ) : (
             <div className="flex min-w-0 flex-col gap-4 w-full">
+              {activeTab === 'trainer' && <TrainerSpaceView />}
               {activeTab === 'trainers' && <TrainersView />}
               {/* Planning & Sessions regroupe les affectations puis le calendrier officiel. */}
               {activeTab === 'planning' && (

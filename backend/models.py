@@ -5,173 +5,103 @@ import datetime
 
 class Role(Base):
     __tablename__ = "roles"
-    id = Column(Integer, primary_key=True, index=True)
-    nom_role = Column(String, unique=True, index=True)
+    id, nom_role = Column(Integer, primary_key=True, index=True), Column(String, unique=True, index=True)
     users = relationship("User", back_populates="role")
 
 class Center(Base):
     __tablename__ = "centers"
-    id = Column(Integer, primary_key=True, index=True)
-    nom_centre = Column(String, unique=True, index=True)
-    profiles = relationship("Profile", back_populates="center")
-    activities = relationship("Activity", back_populates="center")
+    id, nom_centre = Column(Integer, primary_key=True, index=True), Column(String, unique=True, index=True)
+    profiles, activities = relationship("Profile", back_populates="center"), relationship("Activity", back_populates="center")
 
 class Specialty(Base):
     __tablename__ = "specialties"
-    id = Column(Integer, primary_key=True, index=True)
-    nom_specialite = Column(String, unique=True, index=True)
+    id, nom_specialite = Column(Integer, primary_key=True, index=True), Column(String, unique=True, index=True)
     profiles = relationship("Profile", back_populates="specialty")
 
 class ActivityType(Base):
     __tablename__ = "activity_types"
-    id = Column(Integer, primary_key=True, index=True)
-    nom_type = Column(String, unique=True)
-    est_neutralise = Column(Boolean, default=False)
+    id, nom_type, est_neutralise = Column(Integer, primary_key=True, index=True), Column(String, unique=True), Column(Boolean, default=False)
     activities = relationship("Activity", back_populates="activity_type")
 
 class Program(Base):
     __tablename__ = "programs"
-    id = Column(Integer, primary_key=True, index=True)
-    nom_programme = Column(String, unique=True)
+    id, nom_programme = Column(Integer, primary_key=True, index=True), Column(String, unique=True)
     activities = relationship("Activity", back_populates="program")
 
 class Client(Base):
     __tablename__ = "clients"
-    id = Column(Integer, primary_key=True, index=True)
-    nom_client = Column(String, unique=True)
+    id, nom_client = Column(Integer, primary_key=True, index=True), Column(String, unique=True)
     activities = relationship("Activity", back_populates="client")
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
-    employee_id = Column(String, unique=True, index=True)
-    email = Column(String, unique=True, index=True)
-    password_hash = Column(String)
-    role_id = Column(Integer, ForeignKey("roles.id"))
-    is_active = Column(Boolean, default=True)
-    role = relationship("Role", back_populates="users")
-    profile = relationship("Profile", back_populates="user", uselist=False, foreign_keys="[Profile.user_id]")
-    weekly_declarations = relationship("WeeklyDeclaration", back_populates="user")
-    activities = relationship("Activity", back_populates="trainer")
-    unavailability_periods = relationship("UnavailabilityPeriod", back_populates="user")
-    leaves = relationship("Leave", back_populates="user")
-    capacity_targets = relationship("CapacityTarget", back_populates="user")
+    id, employee_id, email = Column(Integer, primary_key=True, index=True), Column(String, unique=True, index=True), Column(String, unique=True, index=True)
+    password_hash, role_id, is_active = Column(String), Column(Integer, ForeignKey("roles.id")), Column(Boolean, default=True)
+    reset_token, reset_token_expires = Column(String, nullable=True), Column(DateTime, nullable=True)
+    two_factor_code, two_factor_expires = Column(String, nullable=True), Column(DateTime, nullable=True)
+    role, profile = relationship("Role", back_populates="users"), relationship("Profile", back_populates="user", uselist=False, foreign_keys="[Profile.user_id]")
+    weekly_declarations, activities = relationship("WeeklyDeclaration", back_populates="user"), relationship("Activity", back_populates="trainer")
+    unavailability_periods, leaves, capacity_targets = relationship("UnavailabilityPeriod", back_populates="user"), relationship("Leave", back_populates="user"), relationship("CapacityTarget", back_populates="user")
 
 class Profile(Base):
     __tablename__ = "profiles"
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
-    first_name = Column(String)
-    last_name = Column(String)
-    job_title = Column(String, nullable=True)
-    home_center_id = Column(Integer, ForeignKey("centers.id"))
-    specialty_id = Column(Integer, ForeignKey("specialties.id"))
-    hire_date = Column(Date, nullable=True)
-    manager_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    user = relationship("User", foreign_keys=[user_id], back_populates="profile")
-    manager = relationship("User", foreign_keys=[manager_id])
-    center = relationship("Center", back_populates="profiles")
-    specialty = relationship("Specialty", back_populates="profiles")
+    id, user_id = Column(Integer, primary_key=True, index=True), Column(Integer, ForeignKey("users.id"), unique=True)
+    first_name, last_name, job_title = Column(String), Column(String), Column(String, nullable=True)
+    home_center_id, specialty_id = Column(Integer, ForeignKey("centers.id")), Column(Integer, ForeignKey("specialties.id"))
+    hire_date, manager_id, phone, bio = Column(Date, nullable=True), Column(Integer, ForeignKey("users.id"), nullable=True), Column(String, nullable=True), Column(String, nullable=True)
+    user, manager = relationship("User", foreign_keys=[user_id], back_populates="profile"), relationship("User", foreign_keys=[manager_id])
+    center, specialty = relationship("Center", back_populates="profiles"), relationship("Specialty", back_populates="profiles")
 
 class WeeklyDeclaration(Base):
     __tablename__ = "weekly_declarations"
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    year = Column(Integer)
-    week_number = Column(Integer)
-    status = Column(String)
-    user = relationship("User", back_populates="weekly_declarations")
-    activities = relationship("Activity", back_populates="weekly_declaration")
+    id, user_id = Column(Integer, primary_key=True, index=True), Column(Integer, ForeignKey("users.id"))
+    year, week_number, status = Column(Integer), Column(Integer), Column(String)
+    user, activities = relationship("User", back_populates="weekly_declarations"), relationship("Activity", back_populates="weekly_declaration")
 
 class Activity(Base):
     __tablename__ = "activities"
-    id = Column(Integer, primary_key=True, index=True)
-    weekly_declaration_id = Column(Integer, ForeignKey("weekly_declarations.id"), nullable=True)
-    trainer_id = Column(Integer, ForeignKey("users.id"))
-    activity_type_id = Column(Integer, ForeignKey("activity_types.id"))
-    program_id = Column(Integer, ForeignKey("programs.id"), nullable=True)
-    client_id = Column(Integer, ForeignKey("clients.id"), nullable=True)
-    center_id = Column(Integer, ForeignKey("centers.id"))
-    activity_date = Column(Date)
-    duration_days = Column(Float)
-    status = Column(String)
-    comment = Column(Text, nullable=True)
-    attachment_id = Column(Integer, nullable=True)
-    weekly_declaration = relationship("WeeklyDeclaration", back_populates="activities")
-    trainer = relationship("User", back_populates="activities")
-    activity_type = relationship("ActivityType", back_populates="activities")
-    program = relationship("Program", back_populates="activities")
-    client = relationship("Client", back_populates="activities")
-    center = relationship("Center", back_populates="activities")
+    id, weekly_declaration_id, trainer_id = Column(Integer, primary_key=True, index=True), Column(Integer, ForeignKey("weekly_declarations.id"), nullable=True), Column(Integer, ForeignKey("users.id"))
+    activity_type_id, program_id, client_id, center_id = Column(Integer, ForeignKey("activity_types.id")), Column(Integer, ForeignKey("programs.id"), nullable=True), Column(Integer, ForeignKey("clients.id"), nullable=True), Column(Integer, ForeignKey("centers.id"))
+    activity_date, duration_days, status, comment, attachment_id = Column(Date), Column(Float), Column(String), Column(Text, nullable=True), Column(Integer, nullable=True)
+    weekly_declaration, trainer = relationship("WeeklyDeclaration", back_populates="activities"), relationship("User", back_populates="activities")
+    activity_type, program, client, center = relationship("ActivityType", back_populates="activities"), relationship("Program", back_populates="activities"), relationship("Client", back_populates="activities"), relationship("Center", back_populates="activities")
     validation_history = relationship("ValidationHistory", back_populates="activity")
 
 class ValidationHistory(Base):
     __tablename__ = "validation_history"
-    id = Column(Integer, primary_key=True, index=True)
-    activity_id = Column(Integer, ForeignKey("activities.id"))
-    author_id = Column(Integer, ForeignKey("users.id"))
-    old_status = Column(String)
-    new_status = Column(String)
-    modification_date = Column(DateTime, default=datetime.datetime.utcnow)
-    activity = relationship("Activity", back_populates="validation_history")
-    author = relationship("User")
+    id, activity_id, author_id = Column(Integer, primary_key=True, index=True), Column(Integer, ForeignKey("activities.id")), Column(Integer, ForeignKey("users.id"))
+    old_status, new_status, modification_date = Column(String), Column(String), Column(DateTime, default=datetime.datetime.utcnow)
+    activity, author = relationship("Activity", back_populates="validation_history"), relationship("User")
 
 class UnavailabilityPeriod(Base):
     __tablename__ = "unavailability_periods"
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    unavailability_type = Column(String)
-    start_date = Column(Date)
-    end_date = Column(Date)
-    coefficient = Column(Float)
+    id, user_id = Column(Integer, primary_key=True, index=True), Column(Integer, ForeignKey("users.id"))
+    unavailability_type, start_date, end_date, coefficient = Column(String), Column(Date), Column(Date), Column(Float)
     user = relationship("User", back_populates="unavailability_periods")
 
 class CalendarExclusion(Base):
     __tablename__ = "calendar_exclusions"
-    id = Column(Integer, primary_key=True, index=True)
-    exclusion_type = Column(String)
-    start_date = Column(Date)
-    end_date = Column(Date)
-    coefficient = Column(Float)
+    id, exclusion_type, start_date, end_date, coefficient = Column(Integer, primary_key=True, index=True), Column(String), Column(Date), Column(Date), Column(Float)
 
 class WeekCoefficient(Base):
     __tablename__ = "week_coefficients"
-
-    id = Column(Integer, primary_key=True, index=True)
-    week_number = Column(Integer, unique=True, index=True)
-    period_label = Column(String, nullable=False)
-    coefficient = Column(Float, nullable=False, default=1.0)
-    is_blocked = Column(Integer, default=0)
+    id, week_number = Column(Integer, primary_key=True, index=True), Column(Integer, unique=True, index=True)
+    period_label, coefficient, is_blocked = Column(String, nullable=False), Column(Float, nullable=False, default=1.0), Column(Integer, default=0)
 
 class CapacityTarget(Base):
     __tablename__ = "capacity_targets"
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    year = Column(Integer)
-    target_capacity_days = Column(Float)
-    available_capacity_days = Column(Float)
+    id, user_id, year = Column(Integer, primary_key=True, index=True), Column(Integer, ForeignKey("users.id")), Column(Integer)
+    target_capacity_days, available_capacity_days = Column(Float), Column(Float)
     user = relationship("User", back_populates="capacity_targets")
 
 class Leave(Base):
     __tablename__ = "leaves"
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    leave_type = Column(String)
-    start_date = Column(Date)
-    end_date = Column(Date)
-    status = Column(String)
+    id, user_id, leave_type = Column(Integer, primary_key=True, index=True), Column(Integer, ForeignKey("users.id")), Column(String)
+    start_date, end_date, status = Column(Date), Column(Date), Column(String)
     user = relationship("User", back_populates="leaves")
 
 class PlanningSession(Base):
     __tablename__ = "planning_sessions"
-    id = Column(String, primary_key=True, index=True)
-    title = Column(String, nullable=False)
-    trainer_name = Column(String, nullable=False)
-    trainer_domain = Column(String, nullable=False)
-    center = Column(String, nullable=False)
-    start_date = Column(String, nullable=False)
-    end_date = Column(String, nullable=False)
-    duration_days = Column(Integer, nullable=False)
-    status = Column(String, nullable=False, default="SCHEDULED")
-    room = Column(String, nullable=True)
-    co_trainer_name = Column(String, nullable=True)
+    id, title, trainer_name = Column(String, primary_key=True, index=True), Column(String, nullable=False), Column(String, nullable=False)
+    trainer_domain, center, start_date, end_date = Column(String, nullable=False), Column(String, nullable=False), Column(String, nullable=False), Column(String, nullable=False)
+    duration_days, status, room, co_trainer_name = Column(Integer, nullable=False), Column(String, nullable=False, default="SCHEDULED"), Column(String, nullable=True), Column(String, nullable=True)

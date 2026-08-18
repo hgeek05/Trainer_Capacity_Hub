@@ -1,11 +1,12 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { User } from 'lucide-react'
+import { User, Settings, Edit3 } from 'lucide-react'
 import { LanguageToggle } from '@/components/language-toggle'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { NotificationPopover } from '@/components/dashboard/top-bar/notification-popover'
 import { TopBarSearch } from '@/components/dashboard/top-bar/top-bar-search'
+import { EditProfileModal } from '@/components/dashboard/edit-profile-modal'
 import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
@@ -33,8 +34,9 @@ export function TopBar({
 }: TopBarProps) {
   const { t } = useLanguage()
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null)
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false)
 
-  useEffect(() => {
+  const loadUser = () => {
     try {
       const stored = localStorage.getItem('current_user')
       if (stored) {
@@ -43,6 +45,10 @@ export function TopBar({
     } catch (e) {
       console.warn('Failed to parse current user from localStorage:', e)
     }
+  }
+
+  useEffect(() => {
+    loadUser()
   }, [])
 
   const periods = [
@@ -62,57 +68,79 @@ export function TopBar({
     .toUpperCase()
 
   return (
-    <header className="flex flex-col gap-4 border-b border-border bg-card px-6 py-4 xl:flex-row xl:items-center xl:justify-between relative z-40">
-      <div className="min-w-0">
-        <p className="text-xs text-muted-foreground">{t.breadcrumbHome}</p>
-        <h1 className="truncate text-lg font-semibold text-balance">{t.pageTitle}</h1>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-3">
-        {/* Sélecteur de période dynamique (Week / Month / Year) */}
-        <div
-          role="radiogroup"
-          aria-label={t.filter}
-          className="flex h-9 items-center gap-1 rounded-full border border-border bg-secondary p-1"
-        >
-          {periods.map((p) => (
-            <button
-              key={p.value}
-              type="button"
-              role="radio"
-              aria-checked={period === p.value}
-              onClick={() => onSelectPeriod?.(p.value)}
-              className={cn(
-                'flex h-7 items-center rounded-full px-3 text-xs font-medium transition-all cursor-pointer',
-                period === p.value
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground',
-              )}
-            >
-              {p.label}
-            </button>
-          ))}
+    <>
+      <header className="flex flex-col gap-4 border-b border-border bg-card px-6 py-4 xl:flex-row xl:items-center xl:justify-between relative z-40">
+        <div className="min-w-0">
+          <p className="text-xs text-muted-foreground">{t.breadcrumbHome}</p>
+          <h1 className="truncate text-lg font-semibold text-balance">{t.pageTitle}</h1>
         </div>
 
-        {/* Composant Recherche avec Popover Autocomplete */}
-        <TopBarSearch searchQuery={searchQuery} onSearchChange={onSearchChange} />
-
-        <LanguageToggle />
-        <ThemeToggle />
-
-        {/* Popover des notifications et alertes dynamiques */}
-        <NotificationPopover selectedCenter={selectedCenter} />
-
-        {/* Profil compact (icône seule avec initiales) */}
-        <div className="pl-2 border-l border-border">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Sélecteur de période dynamique (Week / Month / Year) */}
           <div
-            title={`${displayName} (${displayRole} • ${displayCenter})`}
-            className="flex size-8.5 items-center justify-center rounded-full bg-primary/10 font-bold text-xs text-primary border border-primary/20 shadow-xs cursor-default shrink-0"
+            role="radiogroup"
+            aria-label={t.filter}
+            className="flex h-9 items-center gap-1 rounded-full border border-border bg-secondary p-1"
           >
-            {initials || <User className="size-4" />}
+            {periods.map((p) => (
+              <button
+                key={p.value}
+                type="button"
+                role="radio"
+                aria-checked={period === p.value}
+                onClick={() => onSelectPeriod?.(p.value)}
+                className={cn(
+                  'flex h-7 items-center rounded-full px-3 text-xs font-medium transition-all cursor-pointer',
+                  period === p.value
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Composant Recherche avec Popover Autocomplete */}
+          <TopBarSearch searchQuery={searchQuery} onSearchChange={onSearchChange} />
+
+          <LanguageToggle />
+          <ThemeToggle />
+
+          {/* Popover des notifications et alertes dynamiques */}
+          <NotificationPopover selectedCenter={selectedCenter} />
+
+          {/* Profil interactif ouvrant la modale d'édition */}
+          <div className="pl-2 border-l border-border">
+            <button
+              type="button"
+              onClick={() => setIsEditProfileOpen(true)}
+              className="group flex items-center gap-2.5 p-1 rounded-xl hover:bg-secondary/60 transition-colors cursor-pointer text-left"
+              title="Modifier mon profil"
+            >
+              <div className="flex size-8.5 items-center justify-center rounded-full bg-[#E04F26]/10 font-bold text-xs text-[#E04F26] border border-[#E04F26]/20 shadow-xs shrink-0 group-hover:scale-105 transition-transform">
+                {initials || <User className="size-4" />}
+              </div>
+              <div className="hidden sm:block text-xs leading-tight">
+                <div className="font-semibold text-foreground truncate max-w-[130px]">{displayName}</div>
+                <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                  <span>{displayRole}</span>
+                  <Edit3 className="size-2.5 opacity-0 group-hover:opacity-100 text-[#E04F26] transition-opacity" />
+                </div>
+              </div>
+            </button>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Modale d'édition de profil connectée à la BDD */}
+      <EditProfileModal
+        isOpen={isEditProfileOpen}
+        onClose={() => setIsEditProfileOpen(false)}
+        onProfileUpdated={(updatedUser) => {
+          setCurrentUser(updatedUser)
+        }}
+      />
+    </>
   )
 }

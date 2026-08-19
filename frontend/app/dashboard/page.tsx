@@ -31,11 +31,32 @@ function DashboardContent() {
   const [selectedCenter, setSelectedCenter] = useState<string>('ALL')
   const [selectedTimeframe, setSelectedTimeframe] = useState<'week' | 'month' | 'year'>('year')
   const [searchQuery, setSearchQuery] = useState<string>('')
+  const [userRole, setUserRole] = useState<string>('')
 
   useEffect(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('current_user') || '{}')
+      if (u.role) setUserRole(u.role)
+    } catch (e) {
+      console.warn(e)
+    }
+  }, [])
+
+  useEffect(() => {
+    const isTrainer = userRole === 'Formateur'
     const resolved = resolveTab(tabParam, viewParam)
-    setActiveTab(resolved || 'dashboard')
-  }, [tabParam, viewParam])
+    if (resolved) {
+      if (isTrainer && (resolved === 'dashboard' || resolved === 'trainers')) {
+        setActiveTab('trainer')
+      } else if (!isTrainer && userRole && resolved === 'trainer') {
+        setActiveTab('dashboard')
+      } else {
+        setActiveTab(resolved)
+      }
+    } else {
+      setActiveTab(isTrainer ? 'trainer' : 'dashboard')
+    }
+  }, [tabParam, viewParam, userRole])
 
   const handleSelectTab = (tab: TabType) => {
     setActiveTab(tab)

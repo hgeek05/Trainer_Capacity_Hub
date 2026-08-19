@@ -26,8 +26,6 @@ frontend/*.tsbuildinfo
 pnpm-lock.yaml
 frontend/pnpm-lock.yaml
 
-# Documentation & Internal Notes
-PROJECT_ANALYSIS.md
 
 # IDE & OS
 .vscode

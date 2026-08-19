@@ -63,7 +63,6 @@ export function Sidebar({
         { id: 'dashboard', label: t.dashboard, hint: t.tabHintDashboard, icon: LayoutDashboard },
         { id: 'trainers', label: t.trainers, hint: t.tabHintTrainers, icon: Users },
         { id: 'planning', label: t.planning, hint: t.tabHintPlanning, icon: Calendar },
-        { id: 'trainer', label: "Espace Formateur", hint: "Vue intervenant", icon: UserCheck },
         { id: 'settings', label: t.settings, hint: t.tabHintSettings, icon: Settings },
       ]
 

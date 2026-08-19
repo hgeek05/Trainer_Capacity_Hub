@@ -12,6 +12,9 @@ dist/
 .turbo/
 *.tsbuildinfo
 
+#vercel
+.vercel/
+
 # OS & IDE
 .DS_Store
 .vscode/

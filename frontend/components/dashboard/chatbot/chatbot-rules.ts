@@ -21,8 +21,57 @@ const TRAINERS_DB: TrainerInfo[] = [
   { name: 'Salma Bennis', email: 'salma.bennis@um6p.ma', role: 'Formateur Expert', center: 'Ben Guerir', domain: 'Soft Skills', globalDays: '157/189j', animDays: '112/107j', rate: 83, status: 'watch' },
 ]
 
-export function getBotResponse(userText: string, lang: Lang): string {
+export function getBotResponse(userText: string, lang: Lang, isTrainer: boolean = false, trainerName: string = 'Formateur'): string {
   const query = userText.toLowerCase().trim()
+
+  // ==========================================
+  // MODE 1 : COPILOTE FORMATEUR (Espace Personnel)
+  // ==========================================
+  if (isTrainer) {
+    // 1. Planning / Prochaines sessions / À venir
+    if (query.includes('planning') || query.includes('prochaine') || query.includes('session') || query.includes('cours') || query.includes('prévue') || query.includes('programme') || query.includes('calendrier')) {
+      return lang === 'en'
+        ? `📅 **Your Upcoming Training Schedule (2026)**:\n• **10/08/2026 → 14/08/2026** : Risk Prevention & Industrial Safety (5 days • Ben Guerir - Amphi Al Khwarizmi • Status: Validated ✓)\n• **25/08/2026 → 28/08/2026** : Site Audit & HSE Compliance (4 days • Safi - Pilot Workshop • Status: Pending N+1 ⏳)\n👉 You can consult the full schedule in the *General Planning* tab.`
+        : `📅 **Votre Planning de Formations à Venir (2026)** :\n• **10/08/2026 → 14/08/2026** : Prévention des Risques & Sécurité Industrielle (5 jours • Ben Guerir - Amphi Al Khwarizmi • Statut : Validé ✓)\n• **25/08/2026 → 28/08/2026** : Audit Terrain & Conformité HSE (4 jours • Safi - Atelier Pilote • Statut : En attente N+1 ⏳)\n👉 Vous pouvez consulter l'ensemble du calendrier dans l'onglet *Planning Général*.`
+    }
+
+    // 2. Formations passées / Réalisées / Historique
+    if (query.includes('passée') || query.includes('passe') || query.includes('historique') || query.includes('réalisée') || query.includes('realise') || query.includes('terminée')) {
+      return lang === 'en'
+        ? `📚 **Your Completed Trainings History**:\n• **02/02/2026 → 06/02/2026** : Electrical Risk Training (5 days • Ben Guerir Campus • Status: Validated ✓)\n👉 Total validated days so far in 2026: **82 animation days**.`
+        : `📚 **Vos Formations Déjà Réalisées & Validées** :\n• **02/02/2026 → 06/02/2026** : Formation Risques Électriques (5 jours • Ben Guerir Campus • Statut : Validé ✓)\n👉 Total cumulé d'animation validé en 2026 : **82 jours d'animation**.`
+    }
+
+    // 3. Jauge de charge / Quota / Jours restants / Capacité
+    if (query.includes('charge') || query.includes('jauge') || query.includes('jour') || query.includes('quota') || query.includes('cible') || query.includes('reste') || query.includes('capacité') || query.includes('capacite')) {
+      return lang === 'en'
+        ? `📊 **Your 2026 Activity & Capacity Status**:\n• **Days Delivered / Validated**: 82 animation days\n• **Annual Target**: 107 days / year\n• **Progress**: 77%\n• **Remaining Days**: 25 favorable animation days to reach your 2026 target.`
+        : `📊 **Votre Bilan d'Activité & Jauge 2026** :\n• **Jours réalisés / validés** : 82 jours d'animation\n• **Cible annuelle** : 107 jours / an\n• **Progression** : 77%\n• **Reste à animer** : 25 jours favorables d'animation pour atteindre votre cible 2026.`
+    }
+
+    // 4. Manager N+1 / Circuit de validation
+    if (query.includes('manager') || query.includes('validation') || query.includes('n+1') || query.includes('approbation') || query.includes('responsable')) {
+      return lang === 'en'
+        ? `👤 **Your Validation Workflow (N+1)**:\n• **Manager**: Soufiane ARROUB (Planning & Capacity Manager)\n• **Status**: Active validation flow. Your declared sessions and leaves are directly routed to him for approval.`
+        : `👤 **Votre Circuit de Validation Hiérarchique (N+1)** :\n• **Manager référent** : Soufiane ARROUB (Planning & Capacity Manager)\n• **Statut** : Flux de validation actif. Vos déclarations de sessions ou d'indisponibilités lui sont transmises directement pour arbitrage.`
+    }
+
+    // 5. Disponibilité & Déclaration
+    if (query.includes('disponible') || query.includes('indisponible') || query.includes('statut') || query.includes('déclarer') || query.includes('declarer') || query.includes('congé') || query.includes('conge') || query.includes('activité') || query.includes('activite')) {
+      return lang === 'en'
+        ? `🟢 **Availability & Activity Declaration**:\n• Use the **Status toggle** in your header to switch between Available and Unavailable.\n• Click **\`+ Declare an activity\`** to submit a session, preparation, or leave to your manager.`
+        : `🟢 **Gestion de Disponibilité & Déclaration d'Activité** :\n• Utilisez l'interrupteur **Statut** en haut de *Mon Espace* pour basculer entre Disponible et Indisponible.\n• Cliquez sur **\`+ Déclarer une activité\`** pour soumettre une animation, de l'ingénierie ou un congé à votre manager.`
+    }
+
+    // 6. Réponse par défaut Formateur
+    return lang === 'en'
+      ? `💡 **Trainer Assistant**: Hello ${trainerName}! You can ask me:\n• *"What is my schedule?"*\n• *"My completed trainings"*\n• *"How many days left to reach my target?"*\n• *"Who is my N+1 manager?"*\n• *"How to declare an activity?"*`
+      : `💡 **Assistant Formateur** : Bonjour ${trainerName} ! Vous pouvez me demander :\n• *« Quel est mon planning ? »*\n• *« Mes formations passées »*\n• *« Combien de jours me reste-t-il ? »*\n• *« Qui est mon manager N+1 ? »*\n• *« Comment déclarer une activité ? »*`
+  }
+
+  // ==========================================
+  // MODE 2 : ASSISTANT MANAGER (Pilotage Central)
+  // ==========================================
 
   // 1. Trainer Name Lookup
   const matchedTrainer = TRAINERS_DB.find((t) => {

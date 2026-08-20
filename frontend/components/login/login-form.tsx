@@ -139,7 +139,12 @@ export function LoginForm({ copy }: LoginFormProps) {
       }
     } catch (err: any) {
       console.warn('2FA verification error:', err)
-      setErrorMsg(err?.message || 'Code de vérification invalide ou expiré.')
+      const msg = err?.message || err?.detail || 'Code de vérification invalide ou expiré.'
+      setErrorMsg(
+        msg === 'Failed to fetch' || msg.includes('fetch') || msg === 'Network failure'
+          ? 'Code de vérification incorrect. Veuillez vérifier votre code et réessayer.'
+          : msg
+      )
     } finally {
       setLoading(false)
     }
@@ -163,6 +168,7 @@ export function LoginForm({ copy }: LoginFormProps) {
 
   // Gestion des 6 cases d'OTP
   const handleOtpChange = (index: number, value: string) => {
+    setErrorMsg(null)
     if (value.length > 1) {
       // Gestion du coller (paste)
       const digits = value.replace(/\D/g, '').slice(0, 6).split('')
@@ -187,6 +193,7 @@ export function LoginForm({ copy }: LoginFormProps) {
   }
 
   const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    setErrorMsg(null)
     if (e.key === 'Backspace' && !otpCode[index] && index > 0) {
       inputRefs.current[index - 1]?.focus()
     }

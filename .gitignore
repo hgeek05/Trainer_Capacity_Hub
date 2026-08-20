@@ -26,6 +26,9 @@ frontend/*.tsbuildinfo
 pnpm-lock.yaml
 frontend/pnpm-lock.yaml
 
+# Agents & Tools
+.agents/
+skills-lock.json
 
 # IDE & OS
 .vscode

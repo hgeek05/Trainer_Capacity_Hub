@@ -16,6 +16,7 @@ interface TopBarProps {
   selectedCenter?: string
   searchQuery?: string
   onSearchChange?: (query: string) => void
+  activeTab?: string
 }
 
 interface UserProfile {
@@ -31,6 +32,7 @@ export function TopBar({
   selectedCenter = 'ALL',
   searchQuery,
   onSearchChange,
+  activeTab,
 }: TopBarProps) {
   const { t } = useLanguage()
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null)
@@ -50,6 +52,8 @@ export function TopBar({
   useEffect(() => {
     loadUser()
   }, [])
+
+  const isTrainer = currentUser?.role === 'Formateur' || activeTab === 'trainer'
 
   const periods = [
     { value: 'week' as const, label: t.week || 'Semaine' },
@@ -76,30 +80,32 @@ export function TopBar({
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          {/* Sélecteur de période dynamique (Week / Month / Year) */}
-          <div
-            role="radiogroup"
-            aria-label={t.filter}
-            className="flex h-9 items-center gap-1 rounded-full border border-border bg-secondary p-1"
-          >
-            {periods.map((p) => (
-              <button
-                key={p.value}
-                type="button"
-                role="radio"
-                aria-checked={period === p.value}
-                onClick={() => onSelectPeriod?.(p.value)}
-                className={cn(
-                  'flex h-7 items-center rounded-full px-3 text-xs font-medium transition-all cursor-pointer',
-                  period === p.value
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
+          {/* Sélecteur de période dynamique (Week / Month / Year) - Masqué pour l'interface Formateur */}
+          {!isTrainer && (
+            <div
+              role="radiogroup"
+              aria-label={t.filter}
+              className="flex h-9 items-center gap-1 rounded-full border border-border bg-secondary p-1"
+            >
+              {periods.map((p) => (
+                <button
+                  key={p.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={period === p.value}
+                  onClick={() => onSelectPeriod?.(p.value)}
+                  className={cn(
+                    'flex h-7 items-center rounded-full px-3 text-xs font-medium transition-all cursor-pointer',
+                    period === p.value
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Composant Recherche avec Popover Autocomplete */}
           <TopBarSearch searchQuery={searchQuery} onSearchChange={onSearchChange} />
@@ -108,7 +114,7 @@ export function TopBar({
           <ThemeToggle />
 
           {/* Popover des notifications et alertes dynamiques */}
-          <NotificationPopover selectedCenter={selectedCenter} />
+          <NotificationPopover selectedCenter={selectedCenter} isTrainer={isTrainer} />
 
           {/* Profil interactif ouvrant la modale d'édition */}
           <div className="pl-2 border-l border-border">

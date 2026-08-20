@@ -82,6 +82,7 @@ function DashboardContent() {
           selectedCenter={selectedCenter}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
+          activeTab={activeTab}
         />
         <main className="flex-1 overflow-y-auto p-3.5 md:p-5 space-y-4">
           {activeTab === 'dashboard' ? (

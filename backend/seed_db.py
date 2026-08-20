@@ -5,7 +5,7 @@ def _hash(p: str) -> str:
     return hashlib.sha256((p + os.environ.get("JWT_SECRET_KEY", "default_jwt_secret_trainer_capacity_hub_2026")).encode()).hexdigest()
 
 def seed():
-    print("🚀 Initialisation de la base de données via seed_db.py...")
+    print("[INFO] Initialisation de la base de donnees via seed_db.py...")
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
@@ -44,10 +44,10 @@ def seed():
             db.add(p)
 
         db.commit()
-        print("✅ Base de données initialisée avec succès !")
+        print("[SUCCESS] Base de donnees initialisee avec succes !")
     except Exception as e:
         db.rollback()
-        print(f"❌ Erreur seed : {e}")
+        print(f"[ERROR] Erreur seed : {e}")
     finally:
         db.close()
 

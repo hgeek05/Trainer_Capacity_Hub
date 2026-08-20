@@ -1,10 +1,19 @@
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
+# Charger .env depuis la racine ou le dossier courant
+env_path = Path(__file__).resolve().parent.parent / ".env"
+if env_path.exists():
+    load_dotenv(dotenv_path=env_path)
+else:
+    load_dotenv()
+
 SQLALCHEMY_DATABASE_URL = os.getenv(
-	"DATABASE_URL",
-	"postgresql://postgres:postgres@db:5432/trainer_capacity_hub",
+    "DATABASE_URL",
+    "postgresql://postgres:postgres@localhost:5432/trainer_capacity_hub",
 )
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)

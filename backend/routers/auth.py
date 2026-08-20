@@ -11,7 +11,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "default_jwt_secret_trainer_capacity_hub_2026")
 
 class LoginRateLimiter:
-    def __init__(self, max_attempts: int = 50, window_seconds: int = 10):
+    def __init__(self, max_attempts: int = 5, window_seconds: int = 300):
         self.max_attempts, self.window_seconds = max_attempts, window_seconds
         self.attempts, self._lock = defaultdict(list), threading.Lock()
     def check(self, ip: str, email: str):
@@ -20,7 +20,7 @@ class LoginRateLimiter:
             for k in (ip, email):
                 self.attempts[k] = [t for t in self.attempts[k] if now - t < self.window_seconds]
                 if len(self.attempts[k]) >= self.max_attempts:
-                    raise HTTPException(status_code=429, detail="Trop de tentatives. Veuillez patienter.")
+                    raise HTTPException(status_code=429, detail="Nombre maximal de tentatives de connexion atteint (5 tentatives). Veuillez patienter 5 minutes.")
     def record_fail(self, ip: str, email: str):
         now = time.time()
         with self._lock:
@@ -30,6 +30,11 @@ class LoginRateLimiter:
         with self._lock:
             self.attempts.pop(ip, None)
             self.attempts.pop(email, None)
+    def remaining(self, email: str) -> int:
+        now = time.time()
+        with self._lock:
+            valid = [t for t in self.attempts[email] if now - t < self.window_seconds]
+            return max(0, self.max_attempts - len(valid))
 limiter = LoginRateLimiter()
 
 class LoginReq(BaseModel):
@@ -91,7 +96,10 @@ async def login(req: LoginReq, request: Request, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.email == email).first()
     if not user or not user.is_active or (user.password_hash and user.password_hash != "hashed_password" and user.password_hash != _hash_password(req.password)):
         limiter.record_fail(ip, email)
-        raise HTTPException(status_code=401, detail="Identifiants incorrects ou accès refusé.")
+        rem = limiter.remaining(email)
+        msg = f"Identifiants incorrects ou accès refusé. ({rem} tentative(s) restante(s))." if rem > 0 else "Nombre maximal de tentatives atteint. Veuillez patienter 5 minutes."
+        raise HTTPException(status_code=401, detail=msg)
+    limiter.record_ok(ip, email)
     await _send_otp(user, db)
     return {"status": "2fa_required", "email": user.email, "message": "Un code de vérification à 6 chiffres vous a été envoyé par email."}
 
@@ -100,14 +108,20 @@ def verify_2fa(req: Verify2FAReq, request: Request, db: Session = Depends(get_db
     email, code, ip = req.email.strip().lower(), req.code.strip(), request.client.host if request.client else "127.0.0.1"
     limiter.check(ip, email)
     user = db.query(models.User).filter(models.User.email == email).first()
-    if not user or not user.is_active or not user.two_factor_code:
+    if not user or not user.is_active:
         limiter.record_fail(ip, email)
-        raise HTTPException(status_code=400, detail="Session de vérification invalide ou expirée.")
-    if datetime.utcnow() > user.two_factor_expires or user.two_factor_code != code:
+        raise HTTPException(status_code=400, detail="Compte introuvable ou inactif.")
+    if not user.two_factor_code:
+        limiter.record_fail(ip, email)
+        raise HTTPException(status_code=400, detail="Session de vérification expirée. Veuillez vous reconnecter.")
+    if user.two_factor_expires and datetime.utcnow() > user.two_factor_expires:
         user.two_factor_code, user.two_factor_expires = None, None
         db.commit()
         limiter.record_fail(ip, email)
-        raise HTTPException(status_code=400, detail="Code de vérification incorrect ou expiré.")
+        raise HTTPException(status_code=400, detail="Le code a expiré. Veuillez cliquer sur 'Renvoyer un nouveau code'.")
+    if user.two_factor_code != code:
+        limiter.record_fail(ip, email)
+        raise HTTPException(status_code=400, detail="Code de vérification incorrect. Veuillez vérifier votre code et réessayer.")
     user.two_factor_code, user.two_factor_expires = None, None
     db.commit()
     limiter.record_ok(ip, email)

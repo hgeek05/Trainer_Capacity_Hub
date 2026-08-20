@@ -5,7 +5,8 @@ import React from 'react'
 export function SidebarLogo() {
   return (
     <div className="flex flex-col gap-2.5 px-4 pt-5 pb-5 border-b border-sidebar-border/60 mb-2">
-      <div className="flex items-center justify-start bg-white p-2 rounded-xl border border-sidebar-border/50 shadow-xs">
+      {/* Conteneur Logo UM6P & TechniX : Blanc pur permanent en Light et Dark mode */}
+      <div className="flex items-center justify-start bg-white p-2 rounded-xl border border-white/20 shadow-xs">
         <img
           src="/images/um6p-technix-logo.png"
           alt="UM6P TECHNIX"

@@ -16,8 +16,8 @@ COPY . .
 RUN chown -R appuser:appgroup /app
 USER appuser
 
-# Run database migrations
-RUN cd backend && alembic upgrade head
+# Run database migrations (from root where alembic.ini is located)
+RUN alembic upgrade head
 
 EXPOSE 8000
 

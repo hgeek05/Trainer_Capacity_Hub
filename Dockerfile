@@ -5,11 +5,11 @@ WORKDIR /app
 # Non-root user setup for container security
 RUN addgroup --system appgroup && adduser --system --group appuser
 
-COPY requirements.txt .
-
-# Install dependencies
+# Copy and install backend dependencies
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the entire repository
 COPY . .
 
 # Grant ownership to unprivileged user

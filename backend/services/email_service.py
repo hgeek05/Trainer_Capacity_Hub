@@ -6,7 +6,7 @@ from email.mime.multipart import MIMEMultipart
 def _send_smtp_email(to_email: str, subject: str, html_content: str) -> bool:
     """
     Envoie un e-mail réel à N'IMPORTE QUEL destinataire (Outlook, UM6P, Gmail, etc.)
-    en utilisant un serveur SMTP (ex: Gmail ou Brevo SMTP) sans aucune restriction de domaine.
+    en utilisant le serveur SMTP direct Google Gmail.
     """
     smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com").strip()
     smtp_port = int(os.getenv("SMTP_PORT", "587"))
@@ -39,7 +39,7 @@ def _send_smtp_email(to_email: str, subject: str, html_content: str) -> bool:
 
 async def send_reset_password_email(to_email: str, reset_token: str, user_name: str = "Collaborateur"):
     """
-    Envoie un email de réinitialisation de mot de passe via SMTP Gmail ou Resend.
+    Envoie un email de réinitialisation de mot de passe via SMTP Google Gmail.
     """
     frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3001").rstrip("/")
     reset_link = f"{frontend_url}/login/reset-password?token={reset_token}"
@@ -66,34 +66,12 @@ async def send_reset_password_email(to_email: str, reset_token: str, user_name: 
     </div>
     """
 
-    # 1. Tentative d'envoi par SMTP (Gmail / Brevo)
-    if _send_smtp_email(to_email, subject, html_content):
-        return True
-
-    # 2. Fallback via Resend API si configuré
-    api_key = os.getenv("RESEND_API_KEY", "").strip()
-    if api_key:
-        try:
-            import resend
-            resend.api_key = api_key
-            params = {
-                "from": "Trainer Capacity Hub <onboarding@resend.dev>",
-                "to": [to_email],
-                "subject": subject,
-                "html": html_content
-            }
-            resend.Emails.send(params)
-            print(f"[RESEND SUCCESS] Email envoye via Resend a {to_email}")
-            return True
-        except Exception as e:
-            print(f"[RESEND NOTICE] {e}")
-
-    return True
+    return _send_smtp_email(to_email, subject, html_content)
 
 
 async def send_2fa_otp_email(to_email: str, otp_code: str, user_name: str = "Collaborateur"):
     """
-    Envoie le code de sécurité 2FA à 6 chiffres par email via SMTP Gmail ou Resend.
+    Envoie le code de sécurité 2FA à 6 chiffres par email via SMTP Google Gmail.
     """
     subject = f"{otp_code} est votre code de verification 2FA - Trainer Capacity Hub"
 
@@ -116,26 +94,4 @@ async def send_2fa_otp_email(to_email: str, otp_code: str, user_name: str = "Col
     </div>
     """
 
-    # 1. Tentative d'envoi par SMTP (Gmail / Brevo)
-    if _send_smtp_email(to_email, subject, html_content):
-        return True
-
-    # 2. Fallback via Resend API
-    api_key = os.getenv("RESEND_API_KEY", "").strip()
-    if api_key:
-        try:
-            import resend
-            resend.api_key = api_key
-            params = {
-                "from": "Trainer Capacity Hub <onboarding@resend.dev>",
-                "to": [to_email],
-                "subject": subject,
-                "html": html_content
-            }
-            resend.Emails.send(params)
-            print(f"[RESEND SUCCESS] Code 2FA envoye via Resend a {to_email}")
-            return True
-        except Exception as e:
-            print(f"[RESEND NOTICE] {e}")
-
-    return True
+    return _send_smtp_email(to_email, subject, html_content)

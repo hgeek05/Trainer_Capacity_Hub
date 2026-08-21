@@ -13,7 +13,7 @@ else:
 
 SQLALCHEMY_DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres:postgres@localhost:5432/trainer_capacity_hub",
+    "postgresql://postgres.ikiwgfjquvjetgergugk:TECHNIXCCI10%40%40..@aws-0-eu-central-1.pooler.supabase.com:5432/postgres",
 )
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)

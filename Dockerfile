@@ -16,10 +16,7 @@ COPY . .
 RUN chown -R appuser:appgroup /app
 USER appuser
 
-# Run database migrations (from root where alembic.ini is located)
-RUN alembic upgrade head
-
 EXPOSE 8000
 
-CMD ["sh", "-c", "cd backend && uvicorn main:app --host 0.0.0.0 --port 8000"]
+CMD ["sh", "-c", "alembic upgrade head && cd backend && uvicorn main:app --host 0.0.0.0 --port 8000"]
 

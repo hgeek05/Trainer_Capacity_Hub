@@ -41,7 +41,7 @@ export default function LandingPage() {
           Trainer Capacity Hub
         </h1>
 
-        <p className="text-slate-200 text-xs sm:text-sm max-w-2xl mx-auto mb-10 font-normal leading-relaxed opacity-90">
+        <p className="text-slate-200 text-xs sm:text-sm max-w-2xl mx-auto mb-8 font-normal leading-relaxed opacity-90 min-h-[48px] flex items-center justify-center text-center px-4">
           {t.subtitle}
         </p>
 

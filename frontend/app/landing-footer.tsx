@@ -22,12 +22,12 @@ export function LandingFooter({ sitesHeader, sites }: LandingFooterProps) {
         {sites.map((site) => (
           <div
             key={site.name}
-            className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-[#d6492a]/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group cursor-pointer"
+            className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-[#d6492a]/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group cursor-pointer flex flex-col justify-center min-h-[72px]"
           >
             <p className="text-white font-bold text-xs group-hover:text-[#d6492a] transition-colors">
               {site.name}
             </p>
-            <p className="text-slate-400 text-[11px] mt-0.5 opacity-90">{site.role}</p>
+            <p className="text-slate-400 text-[11px] mt-0.5 opacity-90 line-clamp-2">{site.role}</p>
           </div>
         ))}
       </div>

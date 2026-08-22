@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { ArrowRight, Calendar, LineChart, LogIn } from 'lucide-react'
+import { ArrowRight, Calendar, LineChart } from 'lucide-react'
 import type { LandingContent } from '@/app/landing-content'
 
 interface LandingHeroCardsProps {
@@ -53,16 +53,6 @@ export function LandingHeroCards({ t }: LandingHeroCardsProps) {
             <span>{t.plannerCta}</span>
             <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
           </div>
-        </Link>
-      </div>
-
-      <div className="pt-2">
-        <Link
-          href="/login"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/90 text-xs font-bold text-slate-200 transition-all shadow-xl hover:border-[#d6492a]"
-        >
-          <LogIn className="size-4 text-[#d6492a]" />
-          <span>Connexion avec Email & Mot de Passe (JWT) →</span>
         </Link>
       </div>
     </div>
